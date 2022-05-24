@@ -20,6 +20,13 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.get('/', async () => {
-  return { hello: 'world' }
+Route.resource('users', 'UsersController').apiOnly()
+Route.get('roles', 'RolesController.index')
+
+Route.any('/*', async () => {
+  return {
+    code: 404,
+    status: 'Not Found',
+    message: 'Route not found',
+  }
 })
