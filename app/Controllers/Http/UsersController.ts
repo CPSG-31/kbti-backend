@@ -8,7 +8,7 @@ export default class UsersController {
   public async index({ response }: HttpContextContract) {
     try {
       const users = await User.query().preload('role').where('isActive', true)
-      return response.json({
+      return response.status(200).json({
         code: 200,
         status: 'Success',
         data: users,
@@ -29,7 +29,7 @@ export default class UsersController {
         .preload('role')
         .where('is_active', true)
         .firstOrFail()
-      return response.json({
+      return response.status(200).json({
         code: 200,
         status: 'Success',
         data: user,
@@ -59,7 +59,7 @@ export default class UsersController {
         isActive: true,
       }
       const user = await User.create(validData)
-      return response.json({
+      return response.status(201).json({
         code: 201,
         status: 'Success',
         data: user,
@@ -83,7 +83,7 @@ export default class UsersController {
   public async update({ request, params, response }: HttpContextContract) {
     try {
       const payload = await request.validate(UpdateRoleValidator)
-      const user = await User.query().where('id', params.id).firstOrFail()
+      const user = await User.query().where('id', params.id).where('is_active', true).firstOrFail()
       const role = await Role.query().where('id', payload.roleId).firstOrFail()
 
       user.roleId = role.id
