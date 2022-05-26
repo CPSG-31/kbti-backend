@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column, belongsTo, BelongsTo, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
 import Role from './Role'
+import Definition from './Definition'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -29,4 +30,7 @@ export default class User extends BaseModel {
 
   @belongsTo(() => Role)
   public role: BelongsTo<typeof Role>
+
+  @hasMany(() => Definition)
+  public definitions: HasMany<typeof Definition>
 }
