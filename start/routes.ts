@@ -42,12 +42,7 @@ Route.get('dashboard', async ({ auth }) => {
   }
 })
 
-Route.get('/logout', async ({ auth }) => {
-  await auth.use('api').revoke()
-  return {
-    revoked: true,
-  }
-})
+Route.get('/logout', 'AuthController.logout').middleware('auth')
 
 Route.any('/*', async () => {
   return {

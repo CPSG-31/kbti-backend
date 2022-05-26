@@ -18,7 +18,7 @@ export default class AuthController {
           role_id: user?.roleId || 2,
           username: email?.username,
           email: email,
-          token,
+          access_token: token,
         },
       })
     } catch (error) {
@@ -51,6 +51,23 @@ export default class AuthController {
         })
       }
       return response.status(500).send({
+        code: 500,
+        status: 'Error',
+        message: error.message,
+      })
+    }
+  }
+
+  public async logout({ auth, response }: HttpContextContract) {
+    try {
+      await auth.use('api').revoke()
+      return response.status(200).json({
+        code: 200,
+        status: 'Success',
+        message: 'User has been logged out',
+      })
+    } catch (error) {
+      return response.status(500).json({
         code: 500,
         status: 'Error',
         message: error.message,
