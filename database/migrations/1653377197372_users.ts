@@ -11,6 +11,7 @@ export default class extends BaseSchema {
       table.string('email', 254).notNullable()
       table.string('password', 180).notNullable()
       table.boolean('is_active').notNullable().defaultTo(true)
+      table.string('remember_me_token').nullable()
       table.timestamp('created_at').defaultTo(this.now())
       table.timestamp('updated_at').defaultTo(this.now())
     })
