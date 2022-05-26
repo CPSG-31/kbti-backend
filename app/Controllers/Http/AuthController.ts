@@ -8,7 +8,7 @@ export default class AuthController {
       const { email, password } = request.all()
       const user = await User.findBy('email', email)
       const token = await auth.use('api').attempt(email, password, {
-        expiresIn: '5mins',
+        expiresIn: '2hours',
       })
       return response.status(200).json({
         code: 200,
