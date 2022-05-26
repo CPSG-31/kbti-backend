@@ -1,7 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Role from 'App/Models/Role'
 import User from 'App/Models/User'
-import CreateUser from 'App/Validators/CreateUserValidator'
 import UpdateRoleValidator from 'App/Validators/UpdateRoleValidator'
 
 export default class UsersController {
@@ -40,36 +39,6 @@ export default class UsersController {
           code: 404,
           status: 'Error',
           message: 'User not found',
-        })
-      }
-      return response.status(500).send({
-        code: 500,
-        status: 'Error',
-        message: error.message,
-      })
-    }
-  }
-
-  public async store({ request, response }: HttpContextContract) {
-    try {
-      const payload = await request.validate(CreateUser)
-      const validData = {
-        ...payload,
-        roleId: 2,
-        isActive: true,
-      }
-      const user = await User.create(validData)
-      return response.status(201).json({
-        code: 201,
-        status: 'Success',
-        data: user,
-      })
-    } catch (error) {
-      if (error.name === 'ValidationException') {
-        return response.status(422).send({
-          code: 422,
-          status: 'Error',
-          messages: error.messages,
         })
       }
       return response.status(500).send({

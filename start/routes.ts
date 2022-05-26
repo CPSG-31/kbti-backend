@@ -20,8 +20,34 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.resource('users', 'UsersController').apiOnly()
-Route.get('roles', 'RolesController.index')
+Route.resource('users', 'UsersController')
+  .except(['create', 'edit', 'store'])
+  .middleware({
+    index: ['auth'],
+    show: ['auth'],
+    update: ['auth'],
+    destroy: ['auth'],
+  })
+
+Route.get('roles', 'RolesController.index').middleware('auth')
+Route.post('login', 'AuthController.login')
+Route.post('register', 'AuthController.register')
+Route.get('dashboard', async ({ auth }) => {
+  await auth.use('api').authenticate()
+  console.log(auth.use('api'))
+  return {
+    code: 200,
+    status: 'Success',
+    message: 'User has been logged in',
+  }
+})
+
+Route.get('/logout', async ({ auth }) => {
+  await auth.use('api').revoke()
+  return {
+    revoked: true,
+  }
+})
 
 Route.any('/*', async () => {
   return {
