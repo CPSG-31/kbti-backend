@@ -36,6 +36,13 @@ Route.group(() => {
   Route.get('logout', 'AuthController.logout').middleware('auth')
 })
 
+Route.group(() => {
+  Route.get('/definitions/:term', 'DefinitionsController.index')
+  Route.post('/definitions', 'DefinitionsController.store').middleware('auth')
+  Route.put('/definitions/:id', 'DefinitionsController.update').middleware('auth')
+  Route.delete('/definitions/:id', 'DefinitionsController.destroy').middleware('auth')
+})
+
 Route.any('/*', async () => {
   return {
     code: 404,

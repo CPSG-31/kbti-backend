@@ -1,7 +1,7 @@
 import { schema, rules, CustomMessages } from '@ioc:Adonis/Core/Validator'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
-export default class CreateUserValidator {
+export default class CreateDefinitionValidator {
   constructor(protected ctx: HttpContextContract) {}
 
   /*
@@ -24,9 +24,10 @@ export default class CreateUserValidator {
    *    ```
    */
   public schema = schema.create({
-    username: schema.string([rules.unique({ table: 'users', column: 'username' })]),
-    email: schema.string([rules.email(), rules.unique({ table: 'users', column: 'email' })]),
-    password: schema.string([rules.minLength(8), rules.maxLength(255)]),
+    user_id: schema.number(),
+    term: schema.string([rules.maxLength(255), rules.required()]),
+    definition: schema.string([rules.minLength(10), rules.required()]),
+    category_id: schema.number(),
   })
 
   /**
@@ -41,10 +42,11 @@ export default class CreateUserValidator {
    *
    */
   public messages: CustomMessages = {
-    'username.unique': 'Username already exists',
-    'email.unique': 'Email already exists',
-    'email.email': 'Email must be a valid email',
-    'password.minLength': 'Password must be at least 8 characters',
-    'password.maxLength': 'Password must be less than 255 characters',
+    'user_id.required': 'User id is required',
+    'term.required': 'Term is required',
+    'term.maxLength': 'Term must be less than 255 characters',
+    'definition.required': 'Definition is required',
+    'definition.minLength': 'Definition must be at least 10 characters',
+    'category_id.required': 'Category id is required',
   }
 }
