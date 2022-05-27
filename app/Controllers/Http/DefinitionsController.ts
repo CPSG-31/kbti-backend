@@ -49,13 +49,13 @@ export default class DefinitionsController {
   }
 
   public async store({ request, response }: HttpContextContract) {
-    const defaultstatusDefinitionId = 1
+    const DEFAULT_STATUS_DEFINITION_ID = 1
 
     try {
       const payload = await request.validate(CreateDefinitionValidator)
       const validData = {
         ...payload,
-        statusDefinitionId: defaultstatusDefinitionId,
+        statusDefinitionId: DEFAULT_STATUS_DEFINITION_ID,
       }
       const newDefinition = await Definition.create(validData)
 
@@ -83,7 +83,7 @@ export default class DefinitionsController {
 
   public async update({ params, request, response }: HttpContextContract) {
     const { id } = params
-    const defaultstatusDefinitionId = 1
+    const DEFAULT_STATUS_DEFINITION_ID = 1
     try {
       const payload = await request.validate(CreateDefinitionValidator)
 
@@ -98,7 +98,7 @@ export default class DefinitionsController {
 
       const validData = {
         ...payload,
-        statusDefinitionId: defaultstatusDefinitionId,
+        statusDefinitionId: DEFAULT_STATUS_DEFINITION_ID,
       }
 
       definition.merge(validData)
