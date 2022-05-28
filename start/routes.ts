@@ -43,6 +43,8 @@ Route.group(() => {
   Route.delete('/definitions/:id', 'DefinitionsController.destroy').middleware('auth')
 })
 
+Route.get('/search', 'SearchController.index')
+
 Route.any('/*', async () => {
   return {
     code: 404,
