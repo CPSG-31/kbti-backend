@@ -3,10 +3,10 @@ import Definition from 'App/Models/Definition'
 
 export default class SearchController {
   public async index({ request, response }: HttpContextContract) {
-    const { char, term } = request.qs()
-    const formattedTerm = decodeURI(term).trim()
+    const { q } = request.qs()
+    const formattedQuery = decodeURI(q).trim()
 
-    if (!char || !formattedTerm) {
+    if (!q) {
       return response.status(400).send({
         code: 400,
         status: 'Bad Request',
@@ -15,18 +15,13 @@ export default class SearchController {
     }
 
     try {
-      const QUERY_CHAR = await Definition.query().where('term', 'like', `${char}%`).distinct('term')
-      const QUERY_TERM = await Definition.query()
-        .where('term', 'like', `%${formattedTerm}%`)
-        .distinct('term')
+      const terms = await this.getTerms(formattedQuery)
 
-      const terms = char ? QUERY_CHAR : QUERY_TERM
-
-      if (terms.length === 0) {
-        return response.status(404).json({
+      if (!terms.length) {
+        return response.status(404).send({
           code: 404,
           status: 'Not Found',
-          message: 'Term not found',
+          message: 'No terms found',
         })
       }
 
@@ -43,5 +38,14 @@ export default class SearchController {
         message: 'Internal server error',
       })
     }
+  }
+
+  private getTerms(query) {
+    if (query.length === 1) {
+      return query === '*'
+        ? Definition.query().distinct('term')
+        : Definition.query().where('term', 'like', `${query}%`).distinct('term')
+    }
+    return Definition.query().where('term', 'like', `%${query}%`).distinct('term')
   }
 }
