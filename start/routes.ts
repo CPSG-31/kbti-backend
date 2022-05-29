@@ -45,6 +45,9 @@ Route.group(() => {
 
 Route.get('/search', 'SearchController.index')
 
+Route.get('/terms/new', 'TermsController.getNewlyAddedTerms')
+Route.get('/terms/random', 'TermsController.getRandomDefinitions')
+
 Route.any('/*', async () => {
   return {
     code: 404,
