@@ -70,7 +70,6 @@ export default class TermsController {
         code: 500,
         status: 'Error',
         message: 'Internal server error',
-        data: error.message,
       })
     }
   }
