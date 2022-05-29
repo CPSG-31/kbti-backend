@@ -5,53 +5,34 @@ import CreateDefinitionValidator from 'App/Validators/CreateDefinitionValidator'
 import { DateTime } from 'luxon'
 
 export default class DefinitionsController {
-  public async index({ params, response }: HttpContextContract) {
+  public async index({ request, response }: HttpContextContract) {
     const STATUS_DEFINITION_APPROVED = 2
 
-    const { term } = params
+    const { term, categoryId } = request.qs()
     const formattedTerm = decodeURI(term).trim()
-    if (!formattedTerm) {
+
+    if (!term && !categoryId) {
       return response.status(422).send({
         code: 422,
         status: 'Error',
-        message: 'Term is required',
+        message: 'Term or categoryId is required',
       })
     }
 
-    if (formattedTerm === '*') {
-      const definitions = await Definition.query()
-        .preload('user')
-        .preload('category')
-        .where('status_definition_id', STATUS_DEFINITION_APPROVED)
-        .orderBy('updated_at', 'desc')
-
-      return response.status(200).json({
-        code: 200,
-        status: 'Success',
-        message: 'Definitions found',
-        data: definitions.map((data) => {
-          const { id, term, definition, user, category, createdAt, updatedAt } = data
-
-          return {
-            id,
-            term,
-            definition,
-            category: category.category,
-            username: user.username,
-            created_at: getUnixTimestamp(createdAt),
-            updated_at: getUnixTimestamp(updatedAt),
-          }
-        }),
-      })
-    }
     try {
-      const definitions = await Definition.query()
-        .preload('user')
-        .preload('category')
-        .where('status_definition_id', STATUS_DEFINITION_APPROVED)
-        .where('term', 'like', `%${formattedTerm}%`)
+      const definitions = term
+        ? await Definition.query()
+            .preload('user')
+            .preload('category')
+            .where('status_definition_id', STATUS_DEFINITION_APPROVED)
+            .where('term', 'like', `%${formattedTerm}%`)
+        : await Definition.query()
+            .preload('user')
+            .preload('category')
+            .where('status_definition_id', STATUS_DEFINITION_APPROVED)
+            .where('categoryId', categoryId)
 
-      if (definitions.length === 0) {
+      if (!definitions.length) {
         return response.status(404).json({
           code: 404,
           status: 'Not Found',
