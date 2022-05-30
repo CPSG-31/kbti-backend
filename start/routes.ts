@@ -48,6 +48,8 @@ Route.get('/search', 'SearchController.index')
 Route.get('/terms/new', 'TermsController.getNewlyAddedTerms')
 Route.get('/terms/random', 'TermsController.getRandomDefinitions')
 
+Route.get('/categories', 'CategoriesController.index')
+
 Route.any('/*', async () => {
   return {
     code: 404,
