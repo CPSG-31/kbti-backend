@@ -50,6 +50,9 @@ Route.get('/terms/random', 'TermsController.getRandomDefinitions')
 
 Route.get('/categories', 'CategoriesController.index')
 
+Route.get('/definitions/:id/votes', 'VotesController.index')
+Route.post('/definitions/:id/votes', 'VotesController.store').middleware('auth')
+
 Route.any('/*', async () => {
   return {
     code: 404,
