@@ -1,77 +1,97 @@
+import { OpaqueTokenContract } from '@ioc:Adonis/Addons/Auth'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { createResponse } from 'App/Helpers/Customs'
 import User from 'App/Models/User'
 import CreateUser from 'App/Validators/CreateUserValidator'
 
 export default class AuthController {
-  public async login({ request, response, auth }: HttpContextContract) {
+  protected DEFAULT_USER_ROLE_ID = 2
+  protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
+
+  public async login({ request, response, auth }: HttpContextContract): Promise<void> {
     try {
-      const { email, password } = request.all()
-      const user = await User.findBy('email', email)
-      const token = await auth.use('api').attempt(email, password, {
+      const { email, password }: Record<string, string> = request.all()
+      if (!email || !password) {
+        throw new Error('Email and password are required')
+      }
+
+      const user: User = await User.findByOrFail('email', email)
+      const token: OpaqueTokenContract<User> = await auth.use('api').attempt(email, password, {
         expiresIn: '2hours',
       })
-      return response.status(200).json({
-        code: 200,
-        status: 'Success',
-        data: {
-          user_id: user?.id,
-          role_id: user?.roleId || 2,
-          username: email?.username,
-          email: email,
-          access_token: token,
-        },
-      })
-    } catch (error) {
-      return response.status(401).json({ error: error.message })
+
+      this.res.data = {
+        user_id: user?.id,
+        role_id: user?.roleId || this.DEFAULT_USER_ROLE_ID,
+        username: user?.username,
+        email: email,
+        access_token: token,
+      }
+
+      return response.status(this.res.code).json(this.res)
+    } catch (error: any) {
+      this.res.code = 500
+      this.res.status = 'Error'
+      this.res.message = 'Internal Server Error'
+
+      if (error.message === 'Email and password are required') {
+        this.res.code = 422
+        this.res.status = 'Validation Error'
+        this.res.message = error.message
+      }
+
+      if (error.code === 'E_ROW_NOT_FOUND') {
+        this.res.code = 404
+        this.res.status = 'Not Found'
+        this.res.message = 'Email or password is incorrect'
+      }
+
+      return response.status(this.res.code).json(this.res)
     }
   }
 
-  public async register({ request, response }: HttpContextContract) {
-    const defaultRoleId = 2
-
+  public async register({ request, response }: HttpContextContract): Promise<void> {
     try {
-      const payload = await request.validate(CreateUser)
-      const validData = {
+      const payload: Object = await request.validate(CreateUser)
+
+      const validData: Object = {
         ...payload,
-        roleId: defaultRoleId,
+        roleId: this.DEFAULT_USER_ROLE_ID,
         isActive: true,
       }
-      const user = await User.create(validData)
-      return response.status(201).json({
-        code: 201,
-        status: 'Success',
-        data: user,
-      })
-    } catch (error) {
-      if (error.name === 'ValidationException') {
-        return response.status(422).send({
-          code: 422,
-          status: 'Error',
-          messages: error.messages,
-        })
+
+      const user: User = await User.create(validData)
+      this.res.code = 201
+      this.res.data = user
+
+      return response.status(this.res.code).json(this.res)
+    } catch (error: any) {
+      this.res.code = 500
+      this.res.status = 'Error'
+      this.res.message = 'Internal Server Error'
+
+      if (error.code === 'E_VALIDATION_FAILURE') {
+        this.res.code = 422
+        this.res.status = 'Validation Error'
+        this.res.message = error.messages
       }
-      return response.status(500).send({
-        code: 500,
-        status: 'Error',
-        message: error.message,
-      })
+
+      return response.status(this.res.code).json(this.res)
     }
   }
 
-  public async logout({ auth, response }: HttpContextContract) {
+  public async logout({ auth, response }: HttpContextContract): Promise<void> {
     try {
       await auth.use('api').revoke()
-      return response.status(200).json({
-        code: 200,
-        status: 'Success',
-        message: 'User has been logged out',
-      })
-    } catch (error) {
-      return response.status(500).json({
-        code: 500,
-        status: 'Error',
-        message: error.message,
-      })
+      this.res.message = 'User has been logged out'
+
+      return response.status(this.res.code).json(this.res)
+    } catch (error: any) {
+      this.res.code = 500
+      this.res.status = 'Error'
+      this.res.message = 'Internal Server Error'
+
+      return response.status(this.res.code).json(this.res)
     }
   }
 }
