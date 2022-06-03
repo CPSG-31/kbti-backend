@@ -45,6 +45,6 @@ export default class CreateUserValidator {
     'email.unique': 'Email already exists',
     'email.email': 'Email must be a valid email',
     'password.minLength': 'Password must be at least 8 characters',
-    'password.maxLength': 'Password must be less than 255 characters',
+    'password.maxLength': 'Password must be less than or equals to 255 characters',
   }
 }

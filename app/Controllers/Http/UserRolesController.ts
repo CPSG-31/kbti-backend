@@ -12,7 +12,7 @@ export default class UserRolesController {
         .where('id', params.id)
         .where('is_active', true)
         .firstOrFail()
-      const role = await Role.query().where('id', payload.roleId).firstOrFail()
+      const role = await Role.query().where('id', payload.role_id).firstOrFail()
 
       user.roleId = role.id
       await user.save()
