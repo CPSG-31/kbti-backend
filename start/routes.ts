@@ -49,6 +49,7 @@ Route.get('/terms/new', 'TermsController.getNewlyAddedTerms')
 Route.get('/terms/random', 'TermsController.getRandomDefinitions')
 
 Route.get('/categories', 'CategoriesController.index')
+Route.get('/dashboard', 'DashboardUsersController.index').middleware('auth')
 
 Route.get('/definitions/:id/votes', 'VotesController.index')
 Route.post('/definitions/:id/votes', 'VotesController.store').middleware('auth')
