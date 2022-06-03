@@ -1,47 +1,50 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { createResponse } from 'App/Helpers/Customs'
 import Role from 'App/Models/Role'
 import User from 'App/Models/User'
 import UpdateRoleValidator from 'App/Validators/UpdateRoleValidator'
 
 export default class UserRolesController {
-  public async update({ request, params, response }: HttpContextContract) {
+  protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
+
+  public async update({ request, params, response }: HttpContextContract): Promise<void> {
     try {
-      const payload = await request.validate(UpdateRoleValidator)
-      const user = await User.query()
+      const userId: number = params.id
+      const { role_id: roleId }: { role_id: number } = await request.validate(UpdateRoleValidator)
+
+      const user: User = await User.query()
         .preload('role')
-        .where('id', params.id)
+        .where('id', userId)
         .where('is_active', true)
         .firstOrFail()
-      const role = await Role.query().where('id', payload.role_id).firstOrFail()
+
+      const role: Role = await Role.findOrFail(roleId)
 
       user.roleId = role.id
+
       await user.save()
 
-      return response.json({
-        code: 200,
-        status: 'Success Update Role',
-        message: 'Role has been updated',
-      })
-    } catch (error) {
-      if (error.name === 'ValidationException') {
-        return response.status(422).send({
-          code: 422,
-          status: 'Error',
-          messages: error.messages,
-        })
+      this.res.message = 'User role updated'
+
+      return response.status(this.res.code).json(this.res)
+    } catch (error: any) {
+      this.res.code = 500
+      this.res.status = 'Error'
+      this.res.message = 'Internal Server Error'
+
+      if (error.code === 'E_VALIDATION_FAILURE') {
+        this.res.code = 422
+        this.res.status = 'Validation Error'
+        this.res.message = error.messages
       }
+
       if (error.code === 'E_ROW_NOT_FOUND') {
-        return response.status(404).send({
-          code: 404,
-          status: 'Error',
-          message: 'User or role not found',
-        })
+        this.res.code = 404
+        this.res.status = 'Not Found'
+        this.res.message = 'User or role not found'
       }
-      return response.status(500).send({
-        code: 500,
-        status: 'Error',
-        message: error.message,
-      })
+
+      return response.status(this.res.code).json(this.res)
     }
   }
 }
