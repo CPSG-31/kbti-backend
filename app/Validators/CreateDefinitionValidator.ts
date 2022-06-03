@@ -24,6 +24,7 @@ export default class CreateDefinitionValidator {
    *    ```
    */
   public schema = schema.create({
+    user_id: schema.number(),
     term: schema.string([rules.maxLength(255), rules.required()]),
     definition: schema.string([rules.minLength(10), rules.required()]),
     category_id: schema.number(),
