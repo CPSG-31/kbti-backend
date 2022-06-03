@@ -66,12 +66,13 @@ export default class DefinitionsController {
     }
   }
 
-  public async store({ request, response }: HttpContextContract) {
+  public async store({ request, response, auth }: HttpContextContract) {
     const DEFAULT_STATUS_DEFINITION_ID = 1
-
+    const { id: userId } = auth.user!
     try {
       const payload = await request.validate(CreateDefinitionValidator)
       const validData = {
+        userId,
         ...payload,
         statusDefinitionId: DEFAULT_STATUS_DEFINITION_ID,
       }
@@ -98,7 +99,8 @@ export default class DefinitionsController {
     }
   }
 
-  public async update({ params, request, response }: HttpContextContract) {
+  public async update({ params, request, response, auth }: HttpContextContract) {
+    const { id: userId } = auth.user!
     const { id } = params
     const DEFAULT_STATUS_DEFINITION_ID = 1
     try {
@@ -113,13 +115,14 @@ export default class DefinitionsController {
         })
       }
 
-      const validData = {
-        ...payload,
-        statusDefinitionId: DEFAULT_STATUS_DEFINITION_ID,
-      }
-
-      definition.merge(validData)
-      await definition.save()
+      await Definition.updateOrCreate(
+        { id },
+        {
+          userId,
+          ...payload,
+          statusDefinitionId: DEFAULT_STATUS_DEFINITION_ID,
+        }
+      )
 
       return response.status(200).json({
         code: 200,
