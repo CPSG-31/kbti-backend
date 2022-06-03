@@ -39,7 +39,7 @@ export default class DefinitionsController {
       }
 
       this.res.data = definitions.map((data) => {
-        const { id, term, definition, user, category, createdAt } = data
+        const { id, term, definition, user, category, createdAt }: Definition = data
 
         return {
           id,
@@ -73,7 +73,7 @@ export default class DefinitionsController {
 
     try {
       const payload: Object = await request.validate(CreateDefinitionValidator)
-      const validData = {
+      const validData: Object = {
         userId,
         ...payload,
         statusDefinitionId: DEFAULT_STATUS_DEFINITION_ID,
@@ -105,7 +105,7 @@ export default class DefinitionsController {
     const { id }: Record<string, number> = params
     const DEFAULT_STATUS_DEFINITION_ID: number = 1
     try {
-      const payload = await request.validate(CreateDefinitionValidator)
+      const payload: Object = await request.validate(CreateDefinitionValidator)
 
       await Definition.findOrFail(id)
 
