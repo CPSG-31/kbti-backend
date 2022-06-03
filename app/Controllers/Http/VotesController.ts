@@ -31,12 +31,12 @@ export default class VotesController {
       }
 
       return response.status(this.res.code).json(this.res)
-    } catch (error) {
+    } catch (error: any) {
       this.res.code = 500
       this.res.status = 'Error'
       this.res.message = 'Internal Server Error'
 
-      if (error instanceof Error && error.message === 'E_ROW_NOT_FOUND: Row not found') {
+      if (error.code === 'E_ROW_NOT_FOUND') {
         this.res.code = 404
         this.res.status = 'Not Found'
         this.res.message = 'Definition not found'
@@ -70,7 +70,7 @@ export default class VotesController {
       )
 
       return response.status(this.res.code).json(this.res)
-    } catch (error) {
+    } catch (error: any) {
       this.res.code = 500
       this.res.status = 'Error'
       this.res.message = 'Internal Server Error'
