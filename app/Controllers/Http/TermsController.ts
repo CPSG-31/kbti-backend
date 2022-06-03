@@ -1,35 +1,43 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Definition from 'App/Models/Definition'
-import { getUnixTimestamp } from 'App/Helpers/Customs'
+import { createResponse, getUnixTimestamp } from 'App/Helpers/Customs'
 
 export default class TermsController {
-  private LIMIT = 10
-  private STATUS_APPROVED_ID = 2
+  private LIMIT: number = 10
+  private STATUS_APPROVED_ID: number = 2
+  protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
 
-  public async getNewlyAddedTerms({ response }: HttpContextContract) {
+  public async getNewlyAddedTerms({ response }: HttpContextContract): Promise<void> {
     try {
-      const terms = await Definition.query()
+      const terms: Definition[] = await Definition.query()
         .distinct('term')
         .where('status_definition_id', this.STATUS_APPROVED_ID)
         .orderBy('updated_at', 'desc')
         .limit(this.LIMIT)
 
-      return response.status(200).json({
-        code: 200,
-        status: 'Success',
-        message: 'Terms found',
-        data: terms,
-      })
-    } catch (error) {
-      return response.status(500).json({
-        code: 500,
-        status: 'Error',
-        message: 'Internal server error',
-      })
+      if (!terms.length) {
+        throw new Error('Terms not found')
+      }
+
+      this.res.data = terms
+
+      return response.status(this.res.code).json(this.res)
+    } catch (error: any) {
+      this.res.code = 500
+      this.res.status = 'Error'
+      this.res.message = 'Internal Server Error'
+
+      if (error instanceof Error && error.message === 'Terms not found') {
+        this.res.code = 404
+        this.res.status = 'Not Found'
+        this.res.message = error.message
+      }
+
+      return response.status(this.res.code).json(this.res)
     }
   }
 
-  public async getRandomDefinitions({ response }: HttpContextContract) {
+  public async getRandomDefinitions({ response }: HttpContextContract): Promise<void> {
     try {
       const definitions = await Definition.query()
         .preload('user')
@@ -40,37 +48,36 @@ export default class TermsController {
         .limit(this.LIMIT)
 
       if (!definitions.length) {
-        return response.status(404).json({
-          code: 404,
-          status: 'Not Found',
-          message: 'Terms not found',
-        })
+        throw new Error('Defintions not found')
       }
 
-      return response.status(200).json({
-        code: 200,
-        status: 'Success',
-        message: 'Definitions found',
-        data: definitions.map((data) => {
-          const { id, term, definition, user, category, createdAt, updatedAt } = data
+      this.res.data = definitions.map((data) => {
+        const { id, term, definition, user, category, createdAt, updatedAt } = data
 
-          return {
-            id,
-            term,
-            definition,
-            category: category.category,
-            username: user.username,
-            created_at: getUnixTimestamp(createdAt),
-            updated_at: getUnixTimestamp(updatedAt),
-          }
-        }),
+        return {
+          id,
+          term,
+          definition,
+          category: category.category,
+          username: user.username,
+          created_at: getUnixTimestamp(createdAt),
+          updated_at: getUnixTimestamp(updatedAt),
+        }
       })
-    } catch (error) {
-      return response.status(500).json({
-        code: 500,
-        status: 'Error',
-        message: 'Internal server error',
-      })
+
+      return response.status(this.res.code).json(this.res)
+    } catch (error: any) {
+      this.res.code = 500
+      this.res.status = 'Error'
+      this.res.message = error
+
+      if (error instanceof Error && error.message === 'Definitions not found') {
+        this.res.code = 404
+        this.res.status = 'Not Found'
+        this.res.message = error.message
+      }
+
+      return response.status(this.res.code).json(this.res)
     }
   }
 }
