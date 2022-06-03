@@ -38,6 +38,7 @@ Route.group(() => {
 
 Route.group(() => {
   Route.get('/definitions', 'DefinitionsController.index')
+  Route.get('/definitions/:id', 'DefinitionsController.show').middleware('auth')
   Route.post('/definitions', 'DefinitionsController.store').middleware('auth')
   Route.put('/definitions/:id', 'DefinitionsController.update').middleware('auth')
   Route.delete('/definitions/:id', 'DefinitionsController.destroy').middleware('auth')
