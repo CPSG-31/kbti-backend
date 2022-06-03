@@ -52,7 +52,7 @@ export default class VotesController {
     const { is_upvote: isUpvote }: { is_upvote: boolean } = await request.validate(VoteValidator)
 
     this.res.code = 201
-    this.res.message = 'Definition is voted'
+    this.res.message = 'Definition voted'
 
     try {
       await Definition.findOrFail(definitionId)
