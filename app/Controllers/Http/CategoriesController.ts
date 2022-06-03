@@ -1,30 +1,33 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { createResponse } from 'App/Helpers/Customs'
 import Category from 'App/Models/Category'
 
 export default class CategoriesController {
-  public async index({ response }: HttpContextContract) {
+  protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
+
+  public async index({ response }: HttpContextContract): Promise<void> {
     try {
-      const categories = await Category.query()
+      const categories: Category[] = await Category.query()
 
       if (!categories.length) {
-        return response.status(404).json({
-          code: 404,
-          status: 'Not Found',
-          message: 'Categories not found',
-        })
+        throw new Error('Categories not found')
       }
 
-      return response.status(200).json({
-        code: 200,
-        status: 'Success',
-        data: categories,
-      })
-    } catch (error) {
-      return response.status(500).json({
-        code: 500,
-        status: 'Error',
-        message: error.message,
-      })
+      this.res.data = categories
+
+      return response.status(this.res.code).json(this.res)
+    } catch (error: any) {
+      this.res.code = 500
+      this.res.status = 'Error'
+      this.res.message = 'Internal server error'
+
+      if (error instanceof Error && error.message === 'Terms not found') {
+        this.res.code = 404
+        this.res.status = 'Not Found'
+        this.res.message = error.message
+      }
+
+      return response.status(this.res.code).json(this.res)
     }
   }
 }
