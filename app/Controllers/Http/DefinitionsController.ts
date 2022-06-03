@@ -1,26 +1,28 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { getUnixTimestamp } from 'App/Helpers/Customs'
+import { createResponse, getUnixTimestamp } from 'App/Helpers/Customs'
 import Definition from 'App/Models/Definition'
+import User from 'App/Models/User'
 import CreateDefinitionValidator from 'App/Validators/CreateDefinitionValidator'
 import { DateTime } from 'luxon'
 
 export default class DefinitionsController {
-  public async index({ request, response }: HttpContextContract) {
-    const STATUS_DEFINITION_APPROVED = 2
+  protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
 
-    const { term, categoryId } = request.qs()
-    const formattedTerm = decodeURI(term).trim()
+  public async index({ request, response }: HttpContextContract): Promise<void> {
+    const STATUS_DEFINITION_APPROVED: number = 2
+
+    const { term, categoryId }: Record<string, string> = request.qs()
+    const formattedTerm: string = decodeURI(term).trim()
 
     if (!term && !categoryId) {
-      return response.status(422).send({
-        code: 422,
-        status: 'Error',
-        message: 'Term or categoryId is required',
-      })
+      this.res.code = 422
+      this.res.status = 'Validation Error'
+      this.res.message = 'Term or categoryId is required'
+      return response.status(this.res.code).json(this.res)
     }
 
     try {
-      const definitions = term
+      const definitions: Definition[] = term
         ? await Definition.query()
             .preload('user')
             .preload('category')
@@ -33,87 +35,79 @@ export default class DefinitionsController {
             .where('categoryId', categoryId)
 
       if (!definitions.length) {
-        return response.status(404).json({
-          code: 404,
-          status: 'Not Found',
-          message: 'Term not found',
-        })
+        throw new Error('Definitions not found')
       }
 
-      return response.status(200).json({
-        code: 200,
-        status: 'Success',
-        message: 'Definitions found',
-        data: definitions.map((data) => {
-          const { id, term, definition, user, category, createdAt } = data
+      this.res.data = definitions.map((data) => {
+        const { id, term, definition, user, category, createdAt } = data
 
-          return {
-            id,
-            term,
-            definition,
-            category: category.category,
-            username: user.username,
-            created_at: getUnixTimestamp(createdAt),
-          }
-        }),
+        return {
+          id,
+          term,
+          definition,
+          category: category.category,
+          username: user.username,
+          created_at: getUnixTimestamp(createdAt),
+        }
       })
-    } catch (error) {
-      return response.status(500).json({
-        code: 500,
-        status: 'Error',
-        message: 'Internal server error',
-      })
+
+      return response.status(this.res.code).json(this.res)
+    } catch (error: any) {
+      this.res.code = 500
+      this.res.status = 'Error'
+      this.res.message = 'Internal server error'
+
+      if (error instanceof Error && error.message === 'Definitions not found') {
+        this.res.code = 404
+        this.res.status = 'Not Found'
+        this.res.message = error.message
+      }
+
+      return response.status(this.res.code).json(this.res)
     }
   }
 
-  public async store({ request, response, auth }: HttpContextContract) {
-    const DEFAULT_STATUS_DEFINITION_ID = 1
-    const { id: userId } = auth.user!
+  public async store({ request, response, auth }: HttpContextContract): Promise<void> {
+    const DEFAULT_STATUS_DEFINITION_ID: number = 1
+    const { id: userId }: User = auth.user!
+
     try {
-      const payload = await request.validate(CreateDefinitionValidator)
+      const payload: Object = await request.validate(CreateDefinitionValidator)
       const validData = {
         userId,
         ...payload,
         statusDefinitionId: DEFAULT_STATUS_DEFINITION_ID,
       }
+
       await Definition.create(validData)
 
-      return response.status(201).json({
-        code: 200,
-        status: 'Success',
-        message: 'Definition created',
-      })
-    } catch (error) {
-      if (error.name === 'ValidationException') {
-        return response.status(422).send({
-          code: 422,
-          status: 'Error',
-          messages: error.messages,
-        })
+      this.res.code = 201
+      this.res.message = 'Definition created'
+
+      return response.status(this.res.code).json(this.res)
+    } catch (error: any) {
+      this.res.code = 500
+      this.res.status = 'Error'
+      this.res.message = 'Internal Server Error'
+
+      if (error.code === 'E_VALIDATION_FAILURE') {
+        this.res.code = 422
+        this.res.status = 'Validation Error'
+        this.res.message = error.messages
       }
-      return response.status(500).send({
-        code: 500,
-        status: 'Error',
-        message: 'Internal server error',
-      })
+
+      return response.status(this.res.code).json(this.res)
     }
   }
 
-  public async update({ params, request, response, auth }: HttpContextContract) {
-    const { id: userId } = auth.user!
-    const { id } = params
-    const DEFAULT_STATUS_DEFINITION_ID = 1
+  public async update({ params, request, response, auth }: HttpContextContract): Promise<void> {
+    const { id: userId }: User = auth.user!
+    const { id }: Record<string, number> = params
+    const DEFAULT_STATUS_DEFINITION_ID: number = 1
     try {
       const payload = await request.validate(CreateDefinitionValidator)
 
-      const definition = await Definition.findOrFail(id)
-      if (!definition) {
-        return response.status(404).json({
-          code: 404,
-          status: 'Not Found',
-          message: 'Definition not found',
-        })
-      }
+      await Definition.findOrFail(id)
 
       await Definition.updateOrCreate(
         { id },
@@ -123,56 +117,56 @@ export default class DefinitionsController {
           statusDefinitionId: DEFAULT_STATUS_DEFINITION_ID,
         }
       )
+      this.res.message = 'Definition updated'
 
-      return response.status(200).json({
-        code: 200,
-        status: 'Success',
-        message: 'Definition updated',
-      })
-    } catch (error) {
-      if (error.name === 'ValidationException') {
-        return response.status(422).send({
-          code: 422,
-          status: 'Error',
-          messages: error.messages,
-        })
+      return response.status(this.res.code).json(this.res)
+    } catch (error: any) {
+      this.res.code = 500
+      this.res.status = 'Error'
+      this.res.message = 'Internal Server Error'
+
+      if (error.code === 'E_VALIDATION_FAILURE') {
+        this.res.code = 422
+        this.res.status = 'Validation Error'
+        this.res.message = error.messages
       }
-      return response.status(500).send({
-        code: 500,
-        status: 'Error',
-        message: 'Internal server error',
-      })
+
+      if (error.code === 'E_ROW_NOT_FOUND') {
+        this.res.code = 404
+        this.res.status = 'Not Found'
+        this.res.message = 'Definition not found'
+      }
+
+      return response.status(this.res.code).json(this.res)
     }
   }
 
-  public async destroy({ params, response }: HttpContextContract) {
-    const { id } = params
-    const STATUS_DEFINITION_DELETED = 4
+  public async destroy({ params, response }: HttpContextContract): Promise<void> {
+    const STATUS_DEFINITION_DELETED: number = 4
+    const { id }: Record<string, number> = params
+
     try {
-      const definition = await Definition.findByOrFail('id', id)
-      if (!definition) {
-        return response.status(404).json({
-          code: 404,
-          status: 'Not Found',
-          message: 'Definition not found',
-        })
-      }
+      const definition: Definition = await Definition.findOrFail(id)
 
       definition.statusDefinitionId = STATUS_DEFINITION_DELETED
       definition.deletedAt = DateTime.local()
       await definition.save()
 
-      return response.status(200).json({
-        code: 200,
-        status: 'Success',
-        message: 'Definition deleted',
-      })
-    } catch (error) {
-      return response.status(500).json({
-        code: 500,
-        status: 'Error',
-        message: 'Internal server error',
-      })
+      this.res.message = 'Definition deleted'
+
+      return response.status(this.res.code).json(this.res)
+    } catch (error: any) {
+      this.res.code = 500
+      this.res.status = 'Error'
+      this.res.message = 'Internal Server Error'
+
+      if (error.code === 'E_ROW_NOT_FOUND') {
+        this.res.code = 404
+        this.res.status = 'Not Found'
+        this.res.message = 'Definition not found'
+      }
+
+      return response.status(this.res.code).json(this.res)
     }
   }
 }
