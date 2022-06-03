@@ -67,10 +67,51 @@ export default class DefinitionsController {
     }
   }
 
+  public async show({ params, response }: HttpContextContract): Promise<void> {
+    const STATUS_DEFINITION_DELETED: number = 4
+    const { id: definitionId }: number = params
+
+    try {
+      const data: Definition = await Definition.query()
+        .where('id', definitionId)
+        .whereNot('status_definition_id', STATUS_DEFINITION_DELETED)
+        .preload('user')
+        .preload('category')
+        .firstOrFail()
+
+      if (!data) {
+        throw new Error('Definition not found')
+      }
+      
+      const { id, term, definition, user, category, createdAt }: Definition = data
+      this.res.data = {
+        id,
+        term,
+        definition,
+        category: category,
+        username: user.username,
+        created_at: getUnixTimestamp(createdAt),
+      }
+      
+      return response.status(this.res.code).json(this.res)
+    } catch (error: any) {
+      this.res.code = 500
+      this.res.status = 'Error'
+      this.res.message = 'Internal Server Error'
+
+      if (error.message === 'Definition not found') {
+        this.res.code = 404
+        this.res.status = 'Not Found'
+        this.res.message = error.message
+      }
+
+      return response.status(this.res.code).json(this.res)
+    }
+  }
+
   public async store({ request, response, auth }: HttpContextContract): Promise<void> {
     const DEFAULT_STATUS_DEFINITION_ID: number = 1
     const { id: userId }: User = auth.user!
-
     try {
       const payload: Object = await request.validate(CreateDefinitionValidator)
       const validData: Object = {
