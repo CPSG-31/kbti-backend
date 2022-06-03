@@ -66,6 +66,47 @@ export default class DefinitionsController {
     }
   }
 
+  public async show({ params, response }: HttpContextContract) {
+    const { id: definitionId } = params
+    const STATUS_DEFINITION_DELETED = 4
+    try {
+      const data = await Definition.query()
+        .where('id', definitionId)
+        .whereNot('status_definition_id', STATUS_DEFINITION_DELETED)
+        .preload('user')
+        .preload('category')
+        .first()
+
+      if (!data) {
+        return response.status(404).json({
+          code: 404,
+          status: 'Not Found',
+          message: 'Definition not found',
+        })
+      }
+      const { id, term, definition, user, category, createdAt } = data
+
+      return response.status(200).json({
+        code: 200,
+        status: 'Success',
+        message: 'Definition found',
+        data: {
+          id,
+          term,
+          definition,
+          category: category,
+          username: user.username,
+          created_at: getUnixTimestamp(createdAt),
+        },
+      })
+    } catch (error) {
+      return response.status(500).json({
+        code: 500,
+        status: 'Error',
+        message: error.message,
+      })
+    }
+  }
   public async store({ request, response, auth }: HttpContextContract) {
     const DEFAULT_STATUS_DEFINITION_ID = 1
     const { id: userId } = auth.user!
