@@ -1,46 +1,48 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
+import { createResponse } from 'App/Helpers/Customs'
 import Definition from 'App/Models/Definition'
 
 export default class SearchController {
-  public async index({ request, response }: HttpContextContract) {
-    const { q } = request.qs()
-    const formattedQuery = decodeURI(q).trim()
+  protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
+
+  public async index({ request, response }: HttpContextContract): Promise<void> {
+    const { q }: any = request.qs()
+    const formattedQuery: string = decodeURI(q).trim()
 
     if (!q) {
-      return response.status(400).send({
-        code: 400,
-        status: 'Bad Request',
-        message: 'Term or char are required',
-      })
+      this.res.code = 422
+      this.res.status = 'Validation Error'
+      this.res.message = 'Term or char are required'
+      return response.status(this.res.code).json(this.res)
     }
 
     try {
-      const terms = await this.getTerms(formattedQuery)
+      const terms: Definition[] = await this.getTerms(formattedQuery)
 
       if (!terms.length) {
-        return response.status(404).send({
-          code: 404,
-          status: 'Not Found',
-          message: 'No terms found',
-        })
+        throw new Error('Terms not found')
       }
 
-      return response.status(200).json({
-        code: 200,
-        status: 'Success',
-        message: 'Term found',
-        data: terms,
-      })
-    } catch (error) {
-      return response.status(500).json({
-        code: 500,
-        status: 'Error',
-        message: 'Internal server error',
-      })
+      this.res.data = terms
+
+      return response.status(this.res.code).json(this.res)
+    } catch (error: any) {
+      this.res.code = 500
+      this.res.status = 'Error'
+      this.res.message = 'Internal server error'
+
+      if (error instanceof Error && error.message === 'Terms not found') {
+        this.res.code = 404
+        this.res.status = 'Not Found'
+        this.res.message = error.message
+      }
+
+      return response.status(this.res.code).json(this.res)
     }
   }
 
-  private getTerms(query) {
+  private getTerms(query: string): ModelQueryBuilderContract<typeof Definition, Definition> {
     if (query.length === 1) {
       return query === '*'
         ? Definition.query().distinct('term')
