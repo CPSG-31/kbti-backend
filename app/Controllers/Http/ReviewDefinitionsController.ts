@@ -62,7 +62,7 @@ export default class ReviewDefinitionsController {
   public async update({ params, request, response }: HttpContextContract): Promise<void> {
     const STATUS_DEFINITION_REVIEW = 1
     const { id: definitionId }: Record<string, number> = params
-    const { status_id: statusId }: Record<string, number> = request.all()
+    const { status_definition_id: statusDefinitionId }: Record<string, number> = request.all()
 
     this.res.message = 'Definition reviewed'
 
@@ -76,7 +76,7 @@ export default class ReviewDefinitionsController {
         throw new Error('Definition not found')
       }
 
-      definition.statusDefinitionId = statusId
+      definition.statusDefinitionId = statusDefinitionId
       await definition.save()
 
       return response.status(this.res.code).json(this.res)
