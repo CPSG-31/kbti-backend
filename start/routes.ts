@@ -19,41 +19,44 @@
 */
 
 import Route from '@ioc:Adonis/Core/Route'
+Route.group(() => {
+  Route.post('register', 'AuthController.register')
+  Route.post('login', 'AuthController.login')
+  Route.get('logout', 'AuthController.logout').middleware('auth')
+})
+
+Route.get('/terms/new', 'TermsController.getNewlyAddedTerms')
+Route.get('/terms/random', 'TermsController.getRandomDefinitions')
+Route.get('/categories', 'CategoriesController.index')
+Route.get('/search', 'SearchController.index')
+Route.get('/definitions', 'DefinitionsController.index')
+
+Route.get('/definitions/:id/votes', 'VotesController.index')
+Route.post('/definitions/:id/votes', 'VotesController.store').middleware('auth')
+
+Route.group(() => {
+  Route.get('/dashboard', 'DashboardUsersController.index')
+  Route.get('/definitions/:id', 'DefinitionsController.show')
+  Route.post('/definitions', 'DefinitionsController.store')
+  Route.put('/definitions/:id', 'DefinitionsController.update')
+  Route.delete('/definitions/:id', 'DefinitionsController.destroy')
+}).middleware('auth')
+
+Route.group(() => {
+  Route.get('/admin/definitions', 'ManageDefinitionsController.index')
+  Route.get('/admin/definitions/review', 'ReviewDefinitionsController.index')
+  Route.put('/admin/definitions/:id/review', 'ReviewDefinitionsController.update')
+  Route.get('/admin/definitions/deleted', 'DeletedDefinitionsController.index')
+  Route.delete('/admin/definitions/:id/deleted', 'DeletedDefinitionsController.destroy')
+}).middleware('auth')
 
 Route.group(() => {
   Route.get('users', 'UsersController.index')
   Route.get('users/:id', 'UsersController.show')
   Route.delete('users/:id', 'UsersController.destroy')
+  Route.get('roles', 'RolesController.index')
+  Route.put('users/:id/role', 'UserRolesController.update')
 }).middleware('auth')
-
-Route.put('users/:id/role', 'UserRolesController.update').middleware('auth')
-
-Route.get('roles', 'RolesController.index').middleware('auth')
-
-Route.group(() => {
-  Route.post('login', 'AuthController.login')
-  Route.post('register', 'AuthController.register')
-  Route.get('logout', 'AuthController.logout').middleware('auth')
-})
-
-Route.group(() => {
-  Route.get('/definitions', 'DefinitionsController.index')
-  Route.get('/definitions/:id', 'DefinitionsController.show').middleware('auth')
-  Route.post('/definitions', 'DefinitionsController.store').middleware('auth')
-  Route.put('/definitions/:id', 'DefinitionsController.update').middleware('auth')
-  Route.delete('/definitions/:id', 'DefinitionsController.destroy').middleware('auth')
-})
-
-Route.get('/search', 'SearchController.index')
-
-Route.get('/terms/new', 'TermsController.getNewlyAddedTerms')
-Route.get('/terms/random', 'TermsController.getRandomDefinitions')
-
-Route.get('/categories', 'CategoriesController.index')
-Route.get('/dashboard', 'DashboardUsersController.index').middleware('auth')
-
-Route.get('/definitions/:id/votes', 'VotesController.index')
-Route.post('/definitions/:id/votes', 'VotesController.store').middleware('auth')
 
 Route.any('/*', async () => {
   return {
