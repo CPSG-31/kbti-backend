@@ -6,12 +6,13 @@ import CreateDefinitionValidator from 'App/Validators/CreateDefinitionValidator'
 import { DateTime } from 'luxon'
 
 export default class DefinitionsController {
+  protected STATUS_DEFINITION_DEFAULT: number = 1
+  protected STATUS_DEFINITION_APPROVED: number = 2
+  protected STATUS_DEFINITION_DELETED: number = 4
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
 
   public async index({ request, response }: HttpContextContract): Promise<void> {
-    const STATUS_DEFINITION_APPROVED: number = 2
-
-    const { term, categoryId }: Record<string, string> = request.qs()
+    const { term, categoryId }: Record<string, any> = request.qs()
     const formattedTerm: string = decodeURI(term).trim()
 
     if (!term && !categoryId) {
@@ -23,23 +24,24 @@ export default class DefinitionsController {
 
     try {
       const definitions: Definition[] = term
-        ? await Definition.query()
-            .preload('user')
-            .preload('category')
-            .where('status_definition_id', STATUS_DEFINITION_APPROVED)
-            .where('term', 'like', `%${formattedTerm}%`)
-        : await Definition.query()
-            .preload('user')
-            .preload('category')
-            .where('status_definition_id', STATUS_DEFINITION_APPROVED)
-            .where('categoryId', categoryId)
+        ? await this.getDefinitionsByTerm(formattedTerm)
+        : await this.getDefinitionsByCategory(categoryId)
 
       if (!definitions.length) {
         throw new Error('Definitions not found')
       }
 
       this.res.data = definitions.map((data) => {
-        const { id, term, definition, user, category, createdAt }: Definition = data
+        const {
+          id,
+          term,
+          definition,
+          user,
+          category,
+          totalVotes,
+          totalUpVotes,
+          createdAt,
+        }: Definition = data
 
         return {
           id,
@@ -47,6 +49,8 @@ export default class DefinitionsController {
           definition,
           category: category.category,
           username: user.username,
+          total_votes: totalVotes,
+          up_votes: totalUpVotes || 0,
           created_at: getUnixTimestamp(createdAt),
         }
       })
@@ -55,9 +59,9 @@ export default class DefinitionsController {
     } catch (error: any) {
       this.res.code = 500
       this.res.status = 'Error'
-      this.res.message = 'Internal server error'
+      this.res.message = 'Internal Server Error'
 
-      if (error instanceof Error && error.message === 'Definitions not found') {
+      if (error.message === 'Definitions not found') {
         this.res.code = 404
         this.res.status = 'Not Found'
         this.res.message = error.message
@@ -67,29 +71,32 @@ export default class DefinitionsController {
     }
   }
 
-  public async show({ params, response }: HttpContextContract): Promise<void> {
-    const STATUS_DEFINITION_DELETED: number = 4
+  public async show({ params, response, auth }: HttpContextContract): Promise<void> {
     const { id: definitionId }: Record<string, number> = params
+    const { username }: User = auth.user!
 
     try {
-      const data: Definition = await Definition.query()
-        .where('id', definitionId)
-        .whereNot('status_definition_id', STATUS_DEFINITION_DELETED)
-        .preload('user')
-        .preload('category')
-        .firstOrFail()
+      const data: Definition = await this.getDefinitionById(definitionId)
 
-      if (!data) {
-        throw new Error('Definition not found')
-      }
+      const {
+        id,
+        term,
+        definition,
+        category,
+        totalVotes,
+        totalUpVotes,
+        createdAt,
+        updatedAt,
+      }: Definition = data
 
-      const { id, term, definition, user, category, createdAt, updatedAt }: Definition = data
       this.res.data = {
         id,
         term,
         definition,
-        category: category,
-        username: user.username,
+        category: category.category,
+        username: username,
+        total_votes: totalVotes,
+        up_votes: totalUpVotes || 0,
         created_at: getUnixTimestamp(createdAt),
         updated_at: getUnixTimestamp(updatedAt),
       }
@@ -98,12 +105,12 @@ export default class DefinitionsController {
     } catch (error: any) {
       this.res.code = 500
       this.res.status = 'Error'
-      this.res.message = 'Internal Server Error'
+      this.res.message = error.message
 
-      if (error.message === 'Definition not found') {
+      if (error.code === 'E_ROW_NOT_FOUND') {
         this.res.code = 404
         this.res.status = 'Not Found'
-        this.res.message = error.message
+        this.res.message = 'Definitions not found'
       }
 
       return response.status(this.res.code).json(this.res)
@@ -111,14 +118,13 @@ export default class DefinitionsController {
   }
 
   public async store({ request, response, auth }: HttpContextContract): Promise<void> {
-    const DEFAULT_STATUS_DEFINITION_ID: number = 1
     const { id: userId }: User = auth.user!
     try {
       const payload: Object = await request.validate(CreateDefinitionValidator)
       const validData: Object = {
         userId,
         ...payload,
-        statusDefinitionId: DEFAULT_STATUS_DEFINITION_ID,
+        statusDefinitionId: this.STATUS_DEFINITION_DEFAULT,
       }
 
       await Definition.create(validData)
@@ -145,7 +151,6 @@ export default class DefinitionsController {
   public async update({ params, request, response, auth }: HttpContextContract): Promise<void> {
     const { id: userId }: User = auth.user!
     const { id }: Record<string, number> = params
-    const DEFAULT_STATUS_DEFINITION_ID: number = 1
     try {
       const payload: Object = await request.validate(CreateDefinitionValidator)
 
@@ -156,7 +161,7 @@ export default class DefinitionsController {
         {
           userId,
           ...payload,
-          statusDefinitionId: DEFAULT_STATUS_DEFINITION_ID,
+          statusDefinitionId: this.STATUS_DEFINITION_DEFAULT,
         }
       )
       this.res.message = 'Definition updated'
@@ -184,13 +189,12 @@ export default class DefinitionsController {
   }
 
   public async destroy({ params, response }: HttpContextContract): Promise<void> {
-    const STATUS_DEFINITION_DELETED: number = 4
     const { id }: Record<string, number> = params
 
     try {
       const definition: Definition = await Definition.findOrFail(id)
 
-      definition.statusDefinitionId = STATUS_DEFINITION_DELETED
+      definition.statusDefinitionId = this.STATUS_DEFINITION_DELETED
       definition.deletedAt = DateTime.local()
       await definition.save()
 
@@ -210,5 +214,51 @@ export default class DefinitionsController {
 
       return response.status(this.res.code).json(this.res)
     }
+  }
+
+  private getDefinitionsByCategory(categoryId: number): Promise<Definition[]> {
+    return Definition.query()
+      .withCount('vote', (query) => {
+        query.as('total_votes')
+      })
+      .withAggregate('vote', (query) => {
+        query.sum('is_upvote').as('total_up_votes')
+      })
+      .preload('user', (userQuery) => {
+        userQuery.select('username')
+      })
+      .preload('category')
+      .where('status_definition_id', this.STATUS_DEFINITION_APPROVED)
+      .where('categoryId', categoryId)
+  }
+
+  private getDefinitionsByTerm(term: string): Promise<Definition[]> {
+    return Definition.query()
+      .withCount('vote', (query) => {
+        query.as('total_votes')
+      })
+      .withAggregate('vote', (query) => {
+        query.sum('is_upvote').as('total_up_votes')
+      })
+      .preload('user', (userQuery) => {
+        userQuery.select('username')
+      })
+      .preload('category')
+      .where('status_definition_id', this.STATUS_DEFINITION_APPROVED)
+      .where('term', 'like', `%${term}%`)
+  }
+
+  private getDefinitionById(id: number): Promise<Definition> {
+    return Definition.query()
+      .withCount('vote', (query) => {
+        query.as('total_votes')
+      })
+      .withAggregate('vote', (query) => {
+        query.sum('is_upvote').as('total_up_votes')
+      })
+      .preload('category')
+      .where('id', id)
+      .whereNot('status_definition_id', this.STATUS_DEFINITION_DELETED)
+      .firstOrFail()
   }
 }
