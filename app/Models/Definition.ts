@@ -1,8 +1,9 @@
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, belongsTo, column, HasMany, hasMany } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Category from './Category'
 import StatusDefinition from './StatusDefinition'
+import Vote from './Vote'
 
 export default class Definition extends BaseModel {
   @column({ isPrimary: true })
@@ -23,6 +24,12 @@ export default class Definition extends BaseModel {
   @column()
   public definition: string
 
+  @column()
+  public totalVotes: number
+
+  @column()
+  public totalUpVotes: number
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 
@@ -40,4 +47,7 @@ export default class Definition extends BaseModel {
 
   @belongsTo(() => StatusDefinition)
   public statusDefinition: BelongsTo<typeof StatusDefinition>
+
+  @hasMany(() => Vote)
+  public vote: HasMany<typeof Vote>
 }
