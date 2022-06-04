@@ -24,7 +24,7 @@ export default class UpdateRoleValidator {
    *    ```
    */
   public schema = schema.create({
-    roleId: schema.number(),
+    role_id: schema.number(),
   })
 
   /**

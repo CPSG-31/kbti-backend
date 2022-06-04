@@ -24,8 +24,8 @@ export default class CreateDefinitionValidator {
    *    ```
    */
   public schema = schema.create({
-    term: schema.string([rules.maxLength(255), rules.required()]),
-    definition: schema.string([rules.minLength(10), rules.required()]),
+    term: schema.string([rules.maxLength(255)]),
+    definition: schema.string([rules.minLength(10)]),
     category_id: schema.number(),
   })
 
@@ -43,7 +43,7 @@ export default class CreateDefinitionValidator {
   public messages: CustomMessages = {
     'user_id.required': 'User id is required',
     'term.required': 'Term is required',
-    'term.maxLength': 'Term must be less than 255 characters',
+    'term.maxLength': 'Term must be less than or equals to 255 characters',
     'definition.required': 'Definition is required',
     'definition.minLength': 'Definition must be at least 10 characters',
     'category_id.required': 'Category id is required',
