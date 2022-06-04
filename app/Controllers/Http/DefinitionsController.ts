@@ -69,7 +69,7 @@ export default class DefinitionsController {
 
   public async show({ params, response }: HttpContextContract): Promise<void> {
     const STATUS_DEFINITION_DELETED: number = 4
-    const { id: definitionId }: number = params
+    const { id: definitionId }: Record<string, number> = params
 
     try {
       const data: Definition = await Definition.query()
@@ -82,8 +82,8 @@ export default class DefinitionsController {
       if (!data) {
         throw new Error('Definition not found')
       }
-      
-      const { id, term, definition, user, category, createdAt }: Definition = data
+
+      const { id, term, definition, user, category, createdAt, updatedAt }: Definition = data
       this.res.data = {
         id,
         term,
@@ -91,8 +91,9 @@ export default class DefinitionsController {
         category: category,
         username: user.username,
         created_at: getUnixTimestamp(createdAt),
+        updated_at: getUnixTimestamp(updatedAt),
       }
-      
+
       return response.status(this.res.code).json(this.res)
     } catch (error: any) {
       this.res.code = 500
