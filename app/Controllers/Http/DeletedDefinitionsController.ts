@@ -4,16 +4,15 @@ import Definition from 'App/Models/Definition'
 
 export default class DeletedDefinitionsController {
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
+  protected STATUS_DEFINITION_DELETED: number = 4
 
   public async index({ response }: HttpContextContract): Promise<void> {
-    const STATUS_DEFINITION_DELETED: number = 4
-
     try {
       const definitions: Definition[] = await Definition.query()
         .preload('user')
         .preload('category')
         .preload('statusDefinition')
-        .where('status_definition_id', STATUS_DEFINITION_DELETED)
+        .where('status_definition_id', this.STATUS_DEFINITION_DELETED)
 
       if (!definitions.length) {
         throw new Error('Definitions not found')
@@ -46,12 +45,12 @@ export default class DeletedDefinitionsController {
       })
 
       return response.status(this.res.code).json(this.res)
-    } catch (error) {
+    } catch (error: any) {
       this.res.code = 500
       this.res.status = 'Error'
       this.res.message = 'Internal server error'
 
-      if (error instanceof Error && error.message === 'Definitions not found') {
+      if (error.message === 'Definitions not found') {
         this.res.code = 404
         this.res.status = 'Not Found'
         this.res.message = error.message
@@ -63,12 +62,11 @@ export default class DeletedDefinitionsController {
 
   public async destroy({ params, response }: HttpContextContract): Promise<void> {
     const { id: definitionId }: Record<string, number> = params
-    const STATUS_DEFINITION_DELETED = 4
 
     try {
       const definition: Definition = await Definition.query()
         .where('id', definitionId)
-        .where('status_definition_id', STATUS_DEFINITION_DELETED)
+        .where('status_definition_id', this.STATUS_DEFINITION_DELETED)
         .firstOrFail()
 
       if (!definition) {
@@ -78,12 +76,12 @@ export default class DeletedDefinitionsController {
       await definition.delete()
       this.res.message = 'Definition deleted'
       return response.status(this.res.code).json(this.res)
-    } catch (error) {
+    } catch (error: any) {
       this.res.code = 500
       this.res.status = 'Error'
       this.res.message = 'Internal server error'
 
-      if (error instanceof Error && error.message === 'Definition not found') {
+      if (error.message === 'Definition not found') {
         this.res.code = 404
         this.res.status = 'Not Found'
         this.res.message = error.message
