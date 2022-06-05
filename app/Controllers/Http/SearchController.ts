@@ -43,20 +43,19 @@ export default class SearchController {
   }
 
   private getTerms(query: string): ModelQueryBuilderContract<typeof Definition, Definition> {
-    const STATUS_DEFINITION_APPROVED: number = 2
     if (query.length === 1) {
       return query === '*'
         ? Definition.query()
             .distinct('term')
-            .where('status_definition_id', STATUS_DEFINITION_APPROVED)
+            .where('status_definition_id', StatusDefinitions.APPROVED)
         : Definition.query()
             .where('term', 'like', `${query}%`)
             .distinct('term')
-            .where('status_definition_id', STATUS_DEFINITION_APPROVED)
+            .where('status_definition_id', StatusDefinitions.APPROVED)
     }
     return Definition.query()
       .where('term', 'like', `%${query}%`)
       .distinct('term')
-      .where('status_definition_id', STATUS_DEFINITION_APPROVED)
+      .where('status_definition_id', StatusDefinitions.APPROVED)
   }
 }

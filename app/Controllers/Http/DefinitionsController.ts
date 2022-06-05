@@ -6,9 +6,6 @@ import CreateDefinitionValidator from 'App/Validators/CreateDefinitionValidator'
 import { DateTime } from 'luxon'
 
 export default class DefinitionsController {
-  protected STATUS_DEFINITION_DEFAULT: number = 1
-  protected STATUS_DEFINITION_APPROVED: number = 2
-  protected STATUS_DEFINITION_DELETED: number = 4
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
 
   public async index({ request, response }: HttpContextContract): Promise<void> {
@@ -124,7 +121,7 @@ export default class DefinitionsController {
       const validData: Object = {
         userId,
         ...payload,
-        statusDefinitionId: this.STATUS_DEFINITION_DEFAULT,
+        statusDefinitionId: StatusDefinitions.REVIEW,
       }
 
       await Definition.create(validData)
@@ -161,7 +158,7 @@ export default class DefinitionsController {
         {
           userId,
           ...payload,
-          statusDefinitionId: this.STATUS_DEFINITION_DEFAULT,
+          statusDefinitionId: StatusDefinitions.REVIEW,
         }
       )
       this.res.message = 'Definition updated'
@@ -194,7 +191,7 @@ export default class DefinitionsController {
     try {
       const definition: Definition = await Definition.findOrFail(id)
 
-      definition.statusDefinitionId = this.STATUS_DEFINITION_DELETED
+      definition.statusDefinitionId = StatusDefinitions.DELETED
       definition.deletedAt = DateTime.local()
       await definition.save()
 
@@ -228,7 +225,7 @@ export default class DefinitionsController {
         userQuery.select('username')
       })
       .preload('category')
-      .where('status_definition_id', this.STATUS_DEFINITION_APPROVED)
+      .where('status_definition_id', StatusDefinitions.APPROVED)
       .where('categoryId', categoryId)
   }
 
@@ -244,7 +241,7 @@ export default class DefinitionsController {
         userQuery.select('username')
       })
       .preload('category')
-      .where('status_definition_id', this.STATUS_DEFINITION_APPROVED)
+      .where('status_definition_id', StatusDefinitions.APPROVED)
       .where('term', 'like', `%${term}%`)
   }
 
@@ -258,7 +255,7 @@ export default class DefinitionsController {
       })
       .preload('category')
       .where('id', id)
-      .whereNot('status_definition_id', this.STATUS_DEFINITION_DELETED)
+      .whereNot('status_definition_id', StatusDefinitions.DELETED)
       .firstOrFail()
   }
 }
