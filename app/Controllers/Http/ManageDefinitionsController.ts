@@ -212,10 +212,6 @@ export default class ManageDefinitionsController {
         .where('status_definition_id', StatusDefinitions.DELETED)
         .firstOrFail()
 
-      if (!definition) {
-        throw new Error('Definition not found')
-      }
-
       await definition.delete()
       this.res.message = 'Definition deleted'
       return response.status(this.res.code).json(this.res)
