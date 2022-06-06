@@ -13,6 +13,12 @@ export default class DashboardUsersController {
 
     try {
       const definitions: Definition[] = await Definition.query()
+        .withCount('vote', (query) => {
+          query.as('total_votes')
+        })
+        .withAggregate('vote', (query) => {
+          query.sum('is_upvote').as('total_up_votes')
+        })
         .preload('category')
         .preload('statusDefinition')
         .where('user_id', userId)
@@ -20,13 +26,26 @@ export default class DashboardUsersController {
         .orderBy('updated_at', 'desc')
 
       const dataDefinitions: Object[] = definitions.map((data) => {
-        const { id, term, definition, category, statusDefinition, createdAt, updatedAt } = data
+        const {
+          id,
+          term,
+          definition,
+          category,
+          statusDefinition,
+          totalVotes,
+          createdAt,
+          updatedAt,
+        } = data
+        const totalUpVotes = data.totalUpVotes || 0
+
         return {
           id,
           term,
           definition,
           category: category.category,
           statusDefinition: statusDefinition.statusDefinition,
+          up_votes: totalUpVotes,
+          down_votes: totalVotes - totalUpVotes,
           createdAt: getUnixTimestamp(createdAt),
           updatedAt: getUnixTimestamp(updatedAt),
         }
