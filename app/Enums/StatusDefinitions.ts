@@ -4,3 +4,5 @@ enum StatusDefinitions {
   REJECTED = 3,
   DELETED = 4,
 }
+
+export default StatusDefinitions

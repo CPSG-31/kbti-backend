@@ -1,6 +1,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Definition from 'App/Models/Definition'
 import { createResponse, getUnixTimestamp } from 'App/Helpers/Customs'
+import StatusDefinitions from 'App/Enums/StatusDefinitions'
 
 export default class TermsController {
   private LIMIT: number = 10
