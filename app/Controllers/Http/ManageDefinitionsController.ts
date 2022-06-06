@@ -43,12 +43,12 @@ export default class ManageDefinitionsController {
       })
 
       return response.status(this.res.code).json(this.res)
-    } catch (error) {
+    } catch (error: any) {
       this.res.code = 500
       this.res.status = 'Error'
       this.res.message = 'Internal server error'
 
-      if (error instanceof Error && error.message === 'Definitions not found') {
+      if (error.message === 'Definitions not found') {
         this.res.code = 404
         this.res.status = 'Not Found'
         this.res.message = error.message

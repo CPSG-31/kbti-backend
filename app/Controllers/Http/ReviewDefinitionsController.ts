@@ -42,12 +42,12 @@ export default class ReviewDefinitionsController {
       })
 
       return response.status(this.res.code).json(this.res)
-    } catch (error) {
+    } catch (error: any) {
       this.res.code = 500
       this.res.status = 'Error'
       this.res.message = 'Internal server error'
 
-      if (error instanceof Error && error.message === 'Definitions not found') {
+      if (error.message === 'Definitions not found') {
         this.res.code = 404
         this.res.status = 'Not Found'
         this.res.message = error.message
@@ -60,8 +60,6 @@ export default class ReviewDefinitionsController {
   public async update({ params, request, response }: HttpContextContract): Promise<void> {
     const { id: definitionId }: Record<string, number> = params
     const { status_definition_id: statusDefinitionId }: Record<string, number> = request.all()
-
-    this.res.message = 'Definition reviewed'
 
     try {
       const definition: Definition = await Definition.query()
@@ -76,13 +74,15 @@ export default class ReviewDefinitionsController {
       definition.statusDefinitionId = statusDefinitionId
       await definition.save()
 
+      this.res.message = 'Definition reviewed'
+
       return response.status(this.res.code).json(this.res)
-    } catch (error) {
+    } catch (error: any) {
       this.res.code = 500
       this.res.status = 'Error'
       this.res.message = 'Internal server error'
 
-      if (error instanceof Error && error.message === 'Definition not found') {
+      if (error.message === 'Definition not found') {
         this.res.code = 404
         this.res.status = 'Not Found'
         this.res.message = error.message
