@@ -3,43 +3,36 @@ import { createResponse, getUnixTimestamp } from 'App/Helpers/Customs'
 import Definition from 'App/Models/Definition'
 import StatusDefinitions from 'App/Enums/StatusDefinitions'
 import ReviewDefinitionValidator from 'App/Validators/ReviewDefinitionValidator'
+import { ModelPaginatorContract } from '@ioc:Adonis/Lucid/Orm'
 
 export default class ManageDefinitionsController {
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
-  public async index({ response }: HttpContextContract): Promise<void> {
+  protected LIMIT_PAGINATION = 1
+
+  public async index({ request, response }: HttpContextContract): Promise<void> {
+    const page = request.input('page', 1)
+
     try {
-      const definitions: Definition[] = await Definition.query()
-        .preload('user')
-        .preload('category')
+      const definitionsPaginator: ModelPaginatorContract<Definition> = await Definition.query()
         .preload('statusDefinition')
         .where('status_definition_id', StatusDefinitions.APPROVED)
         .orWhere('status_definition_id', StatusDefinitions.REJECTED)
+        .paginate(page, this.LIMIT_PAGINATION)
+      const { meta, data: definitions } = definitionsPaginator.serialize()
 
       if (!definitions.length) {
         throw new Error('Definitions not found')
       }
 
+      this.res.meta = meta
       this.res.data = definitions.map((data) => {
-        const {
-          id,
-          term,
-          definition,
-          user,
-          category,
-          statusDefinition,
-          createdAt,
-          updatedAt,
-        }: Definition = data
-
         return {
-          id,
-          term,
-          definition,
-          category: category.category,
-          username: user.username,
-          status: statusDefinition.statusDefinition,
-          created_at: getUnixTimestamp(createdAt),
-          updated_at: getUnixTimestamp(updatedAt),
+          id: data.id,
+          term: data.term,
+          definition: data.definition,
+          status: data.statusDefinition.status_definition,
+          created_at: getUnixTimestamp(data.created_at),
+          updated_at: getUnixTimestamp(data.updated_at),
         }
       })
 
@@ -59,39 +52,30 @@ export default class ManageDefinitionsController {
     }
   }
 
-  public async getReviewedDefinitions({ response }: HttpContextContract): Promise<void> {
+  public async getReviewedDefinitions({ request, response }: HttpContextContract): Promise<void> {
+    const page = request.input('page', 1)
     try {
-      const definitions: Definition[] = await Definition.query()
+      const definitionsPaginator: ModelPaginatorContract<Definition> = await Definition.query()
         .preload('user')
-        .preload('category')
         .preload('statusDefinition')
         .where('status_definition_id', StatusDefinitions.REVIEW)
+        .paginate(page, this.LIMIT_PAGINATION)
+
+      const { meta, data: definitions } = definitionsPaginator.serialize()
 
       if (!definitions.length) {
         throw new Error('Definitions not found')
       }
 
+      this.res.meta = meta
       this.res.data = definitions.map((data) => {
-        const {
-          id,
-          term,
-          definition,
-          user,
-          category,
-          statusDefinition,
-          createdAt,
-          updatedAt,
-        }: Definition = data
-
         return {
-          id,
-          term,
-          definition,
-          category: category.category,
-          username: user.username,
-          status: statusDefinition.statusDefinition,
-          created_at: getUnixTimestamp(createdAt),
-          updated_at: getUnixTimestamp(updatedAt),
+          id: data.id,
+          term: data.term,
+          definition: data.definition,
+          username: data.user.username,
+          created_at: getUnixTimestamp(data.created_at),
+          updated_at: getUnixTimestamp(data.updated_at),
         }
       })
 
@@ -148,41 +132,33 @@ export default class ManageDefinitionsController {
     }
   }
 
-  public async getDeletedDefinitions({ response }: HttpContextContract): Promise<void> {
+  public async getDeletedDefinitions({ request, response }: HttpContextContract): Promise<void> {
+    const page = request.input('page', 1)
+
     try {
-      const definitions: Definition[] = await Definition.query()
+      const definitionsPaginator: ModelPaginatorContract<Definition> = await Definition.query()
         .preload('user')
         .preload('category')
         .preload('statusDefinition')
         .where('status_definition_id', StatusDefinitions.DELETED)
+        .paginate(page, this.LIMIT_PAGINATION)
+
+      const { meta, data: definitions } = definitionsPaginator.serialize()
 
       if (!definitions.length) {
         throw new Error('Definitions not found')
       }
 
+      this.res.meta = meta
       this.res.data = definitions.map((data) => {
-        const {
-          id,
-          term,
-          definition,
-          user,
-          category,
-          statusDefinition,
-          createdAt,
-          updatedAt,
-          deletedAt,
-        }: Definition = data
-
         return {
-          id,
-          term,
-          definition,
-          category: category.category,
-          username: user.username,
-          status: statusDefinition.statusDefinition,
-          created_at: getUnixTimestamp(createdAt),
-          updated_at: getUnixTimestamp(updatedAt),
-          deleted_at: getUnixTimestamp(deletedAt),
+          id: data.id,
+          term: data.term,
+          definition: data.definition,
+          username: data.user.username,
+          created_at: getUnixTimestamp(data.created_at),
+          updated_at: getUnixTimestamp(data.updated_at),
+          deleted_at: getUnixTimestamp(data.deleted_at),
         }
       })
 
