@@ -4,6 +4,7 @@ import Definition from 'App/Models/Definition'
 import User from 'App/Models/User'
 import CreateDefinitionValidator from 'App/Validators/CreateDefinitionValidator'
 import { DateTime } from 'luxon'
+import StatusDefinitions from 'App/Enums/StatusDefinitions'
 
 export default class DefinitionsController {
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })

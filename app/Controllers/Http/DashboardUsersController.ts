@@ -3,6 +3,7 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import { createResponse, getUnixTimestamp } from 'App/Helpers/Customs'
 import Definition from 'App/Models/Definition'
 import User from 'App/Models/User'
+import StatusDefinitions from 'App/Enums/StatusDefinitions'
 
 export default class DashboardUsersController {
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })

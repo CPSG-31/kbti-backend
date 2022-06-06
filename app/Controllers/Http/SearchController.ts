@@ -2,6 +2,7 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
 import { createResponse } from 'App/Helpers/Customs'
 import Definition from 'App/Models/Definition'
+import StatusDefinitions from 'App/Enums/StatusDefinitions'
 
 export default class SearchController {
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
