@@ -2,10 +2,10 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { createResponse, getUnixTimestamp } from 'App/Helpers/Customs'
 import Definition from 'App/Models/Definition'
 import StatusDefinitions from 'App/Enums/StatusDefinitions'
+import ReviewDefinitionValidator from 'App/Validators/ReviewDefinitionValidator'
 
 export default class ManageDefinitionsController {
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
-
   public async index({ response }: HttpContextContract): Promise<void> {
     try {
       const definitions: Definition[] = await Definition.query()
@@ -117,9 +117,8 @@ export default class ManageDefinitionsController {
     response,
   }: HttpContextContract): Promise<void> {
     const { id: definitionId }: Record<string, number> = params
-    const { status_definition_id: statusDefinitionId }: Record<string, number> = request.only([
-      'status_definition_id',
-    ])
+    const { status_definition_id: statusDefinitionId }: { status_definition_id: number } =
+      await request.validate(ReviewDefinitionValidator)
 
     try {
       const definition: Definition = await Definition.query()
