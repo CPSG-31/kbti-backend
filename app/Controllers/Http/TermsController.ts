@@ -4,14 +4,13 @@ import { createResponse, getUnixTimestamp } from 'App/Helpers/Customs'
 
 export default class TermsController {
   private LIMIT: number = 10
-  private STATUS_APPROVED_ID: number = 2
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
 
   public async getNewlyAddedTerms({ response }: HttpContextContract): Promise<void> {
     try {
       const terms: Definition[] = await Definition.query()
         .distinct('term')
-        .where('status_definition_id', this.STATUS_APPROVED_ID)
+        .where('status_definition_id', StatusDefinitions.APPROVED)
         .orderBy('updated_at', 'desc')
         .limit(this.LIMIT)
 
@@ -42,7 +41,7 @@ export default class TermsController {
       const definitions = await Definition.query()
         .preload('user')
         .preload('category')
-        .where('status_definition_id', this.STATUS_APPROVED_ID)
+        .where('status_definition_id', StatusDefinitions.APPROVED)
         .groupBy('term')
         .orderByRaw('RAND()')
         .limit(this.LIMIT)

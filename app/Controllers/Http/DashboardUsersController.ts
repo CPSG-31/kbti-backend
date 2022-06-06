@@ -5,11 +5,6 @@ import Definition from 'App/Models/Definition'
 import User from 'App/Models/User'
 
 export default class DashboardUsersController {
-  private STATUS_DEFINITION_REVIEW: number = 1
-  private STATUS_DEFINITION_APPROVED: number = 2
-  private STATUS_DEFINITION_REJECTED: number = 3
-  private STATUS_DEFINITION_DELETED: number = 4
-
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
 
   public async index({ response, auth }: HttpContextContract): Promise<void> {
@@ -20,7 +15,7 @@ export default class DashboardUsersController {
         .preload('category')
         .preload('statusDefinition')
         .where('user_id', userId)
-        .whereNot('status_definition_id', this.STATUS_DEFINITION_DELETED)
+        .whereNot('status_definition_id', StatusDefinitions.DELETED)
         .orderBy('updated_at', 'desc')
 
       const dataDefinitions: Object[] = definitions.map((data) => {
@@ -38,17 +33,17 @@ export default class DashboardUsersController {
 
       const totaldefinitionApproved: any = await this.getTotalDefinition(
         userId,
-        this.STATUS_DEFINITION_APPROVED
+        StatusDefinitions.APPROVED
       )
 
       const totaldefinitionReview: any = await this.getTotalDefinition(
         userId,
-        this.STATUS_DEFINITION_REVIEW
+        StatusDefinitions.REVIEW
       )
 
       const totaldefinitionRejected: any = await this.getTotalDefinition(
         userId,
-        this.STATUS_DEFINITION_REJECTED
+        StatusDefinitions.REJECTED
       )
 
       this.res.data = {

@@ -5,7 +5,6 @@ import User from 'App/Models/User'
 import CreateUser from 'App/Validators/CreateUserValidator'
 
 export default class AuthController {
-  protected DEFAULT_USER_ROLE_ID = 2
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
 
   public async login({ request, response, auth }: HttpContextContract): Promise<void> {
@@ -22,7 +21,7 @@ export default class AuthController {
 
       this.res.data = {
         user_id: user?.id,
-        role_id: user?.roleId || this.DEFAULT_USER_ROLE_ID,
+        role_id: user?.roleId || Roles.USER,
         username: user?.username,
         email: email,
         access_token: token,
@@ -56,7 +55,7 @@ export default class AuthController {
 
       const validData: Object = {
         ...payload,
-        roleId: this.DEFAULT_USER_ROLE_ID,
+        roleId: Roles.USER,
         isActive: true,
       }
 
