@@ -43,12 +43,14 @@ Route.group(() => {
 }).middleware('auth')
 
 Route.group(() => {
-  Route.get('/admin/definitions', 'ManageDefinitionsController.index')
-  Route.get('/admin/definitions/review', 'ReviewDefinitionsController.index')
-  Route.put('/admin/definitions/:id/review', 'ReviewDefinitionsController.update')
-  Route.get('/admin/definitions/deleted', 'DeletedDefinitionsController.index')
-  Route.delete('/admin/definitions/:id/deleted', 'DeletedDefinitionsController.destroy')
-}).middleware('auth')
+  Route.get('/definitions', 'ManageDefinitionsController.index')
+  Route.get('/definitions/review', 'ManageDefinitionsController.getReviewedDefinitions')
+  Route.put('/definitions/:id/review', 'ManageDefinitionsController.reviewDefinitions')
+  Route.get('/definitions/deleted', 'ManageDefinitionsController.getDeletedDefinitions')
+  Route.delete('/definitions/:id/delete', 'ManageDefinitionsController.destroy')
+})
+  .middleware('auth')
+  .prefix('/admin')
 
 Route.group(() => {
   Route.get('users', 'UsersController.index')
