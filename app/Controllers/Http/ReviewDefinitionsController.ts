@@ -6,14 +6,12 @@ export default class ReviewDefinitionsController {
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
 
   public async index({ response }: HttpContextContract): Promise<void> {
-    const STATUS_DEFINITION_REVIEW: number = 1
-
     try {
       const definitions: Definition[] = await Definition.query()
         .preload('user')
         .preload('category')
         .preload('statusDefinition')
-        .where('status_definition_id', STATUS_DEFINITION_REVIEW)
+        .where('status_definition_id', StatusDefinitions.REVIEW)
 
       if (!definitions.length) {
         throw new Error('Definitions not found')
@@ -60,7 +58,6 @@ export default class ReviewDefinitionsController {
   }
 
   public async update({ params, request, response }: HttpContextContract): Promise<void> {
-    const STATUS_DEFINITION_REVIEW = 1
     const { id: definitionId }: Record<string, number> = params
     const { status_definition_id: statusDefinitionId }: Record<string, number> = request.all()
 
@@ -69,7 +66,7 @@ export default class ReviewDefinitionsController {
     try {
       const definition: Definition = await Definition.query()
         .where('id', definitionId)
-        .where('status_definition_id', STATUS_DEFINITION_REVIEW)
+        .where('status_definition_id', StatusDefinitions.REVIEW)
         .firstOrFail()
 
       if (!definition) {

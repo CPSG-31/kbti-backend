@@ -4,7 +4,6 @@ import Definition from 'App/Models/Definition'
 
 export default class DeletedDefinitionsController {
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
-  protected STATUS_DEFINITION_DELETED: number = 4
 
   public async index({ response }: HttpContextContract): Promise<void> {
     try {
@@ -12,7 +11,7 @@ export default class DeletedDefinitionsController {
         .preload('user')
         .preload('category')
         .preload('statusDefinition')
-        .where('status_definition_id', this.STATUS_DEFINITION_DELETED)
+        .where('status_definition_id', StatusDefinitions.DELETED)
 
       if (!definitions.length) {
         throw new Error('Definitions not found')
@@ -66,7 +65,7 @@ export default class DeletedDefinitionsController {
     try {
       const definition: Definition = await Definition.query()
         .where('id', definitionId)
-        .where('status_definition_id', this.STATUS_DEFINITION_DELETED)
+        .where('status_definition_id', StatusDefinitions.DELETED)
         .firstOrFail()
 
       if (!definition) {

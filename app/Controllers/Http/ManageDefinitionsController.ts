@@ -6,16 +6,13 @@ export default class ManageDefinitionsController {
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
 
   public async index({ response }: HttpContextContract): Promise<void> {
-    const STATUS_DEFINITION_APPROVED: number = 2
-    const STATUS_DEFINITION_REJECTED: number = 3
-
     try {
       const definitions: Definition[] = await Definition.query()
         .preload('user')
         .preload('category')
         .preload('statusDefinition')
-        .where('status_definition_id', STATUS_DEFINITION_APPROVED)
-        .orWhere('status_definition_id', STATUS_DEFINITION_REJECTED)
+        .where('status_definition_id', StatusDefinitions.APPROVED)
+        .orWhere('status_definition_id', StatusDefinitions.REJECTED)
 
       if (!definitions.length) {
         throw new Error('Definitions not found')
