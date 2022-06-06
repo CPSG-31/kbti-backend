@@ -4,6 +4,7 @@ import { createResponse } from 'App/Helpers/Customs'
 import User from 'App/Models/User'
 import CreateUser from 'App/Validators/CreateUserValidator'
 import Roles from 'App/Enums/Roles'
+
 export default class AuthController {
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
 
