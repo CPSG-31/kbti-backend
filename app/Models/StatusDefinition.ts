@@ -3,11 +3,11 @@ import Definition from './Definition'
 
 export default class StatusDefinition extends BaseModel {
   @column({ isPrimary: true })
-  public id: number
+  public id!: number
 
   @column()
-  public statusDefinition: string
+  public statusDefinition!: string
 
   @hasMany(() => Definition)
-  public definition: HasMany<typeof Definition>
+  public definition!: HasMany<typeof Definition>
 }

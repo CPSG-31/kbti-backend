@@ -7,47 +7,47 @@ import Vote from './Vote'
 
 export default class Definition extends BaseModel {
   @column({ isPrimary: true })
-  public id: number
+  public id!: number
 
   @column()
-  public userId: number
+  public userId!: number
 
   @column()
-  public statusDefinitionId: number
+  public statusDefinitionId!: number
 
   @column()
-  public categoryId: number
+  public categoryId!: number
 
   @column()
-  public term: string
+  public term!: string
 
   @column()
-  public definition: string
+  public definition!: string
 
   @column()
-  public totalVotes: number
+  public totalVotes!: number
 
   @column()
-  public totalUpVotes: number
+  public totalUpVotes!: number
 
   @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
+  public createdAt!: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime
+  public updatedAt!: DateTime
 
   @column.dateTime()
-  public deletedAt: DateTime
+  public deletedAt!: DateTime
 
   @belongsTo(() => User)
-  public user: BelongsTo<typeof User>
+  public user!: BelongsTo<typeof User>
 
   @belongsTo(() => Category)
-  public category: BelongsTo<typeof Category>
+  public category!: BelongsTo<typeof Category>
 
   @belongsTo(() => StatusDefinition)
-  public statusDefinition: BelongsTo<typeof StatusDefinition>
+  public statusDefinition!: BelongsTo<typeof StatusDefinition>
 
   @hasMany(() => Vote)
-  public vote: HasMany<typeof Vote>
+  public vote!: HasMany<typeof Vote>
 }

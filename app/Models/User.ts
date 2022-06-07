@@ -14,34 +14,34 @@ import Hash from '@ioc:Adonis/Core/Hash'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
-  public id: number
+  public id!: number
 
   @column()
-  public roleId: number
+  public roleId!: number
 
   @column()
-  public username: string
+  public username!: string
 
   @column()
-  public email: string
-
-  @column({ serializeAs: null })
-  public password: string
+  public email!: string
 
   @column()
-  public isActive: boolean
+  public password!: string
+
+  @column()
+  public isActive!: boolean
 
   @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
+  public createdAt!: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime
+  public updatedAt!: DateTime
 
   @belongsTo(() => Role)
-  public role: BelongsTo<typeof Role>
+  public role!: BelongsTo<typeof Role>
 
   @hasMany(() => Definition)
-  public definitions: HasMany<typeof Definition>
+  public definitions!: HasMany<typeof Definition>
 
   @beforeSave()
   public static async hashPassword(user: User) {
