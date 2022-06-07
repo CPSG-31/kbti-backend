@@ -49,12 +49,10 @@ export default class VotesController {
   public async store({ params, response, request, auth }: HttpContextContract): Promise<void> {
     const { id: definitionId }: Record<string, any> = params
     const { id: userId }: { id: number } = auth.user!
-    const { is_upvote: isUpvote }: { is_upvote: boolean } = await request.validate(VoteValidator)
-
-    this.res.code = 201
-    this.res.message = 'Definition voted'
 
     try {
+      const { is_upvote: isUpvote }: { is_upvote: boolean } = await request.validate(VoteValidator)
+
       await Definition.findOrFail(definitionId)
 
       await Vote.updateOrCreate(
@@ -69,13 +67,22 @@ export default class VotesController {
         }
       )
 
+      this.res.code = 201
+      this.res.message = 'Definition voted'
+
       return response.status(this.res.code).json(this.res)
     } catch (error: any) {
       this.res.code = 500
       this.res.status = 'Error'
       this.res.message = 'Internal Server Error'
 
-      if (error instanceof Error && error.message === 'E_ROW_NOT_FOUND: Row not found') {
+      if (error.code === 'E_VALIDATION_FAILURE') {
+        this.res.code = 422
+        this.res.status = 'Validation Error'
+        this.res.message = error.messages
+      }
+
+      if (error.message === 'E_ROW_NOT_FOUND') {
         this.res.code = 404
         this.res.status = 'Not Found'
         this.res.message = 'Definition not found'
