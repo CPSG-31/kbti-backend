@@ -33,7 +33,7 @@ export default class SearchController {
       this.res.status = 'Error'
       this.res.message = 'Internal server error'
 
-      if (error instanceof Error && error.message === 'Terms not found') {
+      if (error.message === 'Terms not found') {
         this.res.code = 404
         this.res.status = 'Not Found'
         this.res.message = error.message
