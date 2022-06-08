@@ -4,7 +4,6 @@
       - Auth
     summary: Login User
     requestBody:
-      description: 'optional'
       required: true
       content:
         application/json:
