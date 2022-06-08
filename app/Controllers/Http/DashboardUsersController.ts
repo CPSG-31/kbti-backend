@@ -1,6 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
-import { createResponse, getUnixTimestamp } from 'App/Helpers/Customs'
+import { createResponse, getUnixTimestamp, getTotalDownVotes } from 'App/Helpers/Customs'
 import Definition from 'App/Models/Definition'
 import User from 'App/Models/User'
 import StatusDefinitions from 'App/Enums/StatusDefinitions'
@@ -33,10 +33,10 @@ export default class DashboardUsersController {
           category,
           statusDefinition,
           totalVotes,
+          totalUpVotes,
           createdAt,
           updatedAt,
         } = data
-        const totalUpVotes = data.totalUpVotes || 0
 
         return {
           id,
@@ -44,8 +44,8 @@ export default class DashboardUsersController {
           definition,
           category: category.category,
           statusDefinition: statusDefinition.statusDefinition,
-          up_votes: totalUpVotes,
-          down_votes: totalVotes - totalUpVotes,
+          up_votes: totalUpVotes || 0,
+          down_votes: getTotalDownVotes(totalVotes, totalUpVotes),
           createdAt: getUnixTimestamp(createdAt),
           updatedAt: getUnixTimestamp(updatedAt),
         }

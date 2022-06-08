@@ -7,7 +7,7 @@ import { ModelPaginatorContract } from '@ioc:Adonis/Lucid/Orm'
 
 export default class ManageDefinitionsController {
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
-  protected LIMIT_PAGINATION = 1
+  protected LIMIT_PAGINATION = 10
 
   public async index({ request, response }: HttpContextContract): Promise<void> {
     const page = request.input('page', 1)

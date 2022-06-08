@@ -17,3 +17,7 @@ export function createResponse(res: ResponseInterface): {
     data: res.data,
   }
 }
+
+export function getTotalDownVotes(totalVotes: number, totalUpVotes: number): number {
+  return totalVotes - (totalUpVotes || 0)
+}
