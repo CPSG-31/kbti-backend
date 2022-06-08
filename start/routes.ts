@@ -31,7 +31,6 @@ Route.get('/categories', 'CategoriesController.index')
 Route.get('/search', 'SearchController.index')
 Route.get('/definitions', 'DefinitionsController.index')
 
-Route.get('/definitions/:id/votes', 'VotesController.index')
 Route.post('/definitions/:id/votes', 'VotesController.store').middleware('auth')
 
 Route.group(() => {
