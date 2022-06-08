@@ -43,7 +43,7 @@ export default class VotesController {
         this.res.message = error.messages
       }
 
-      if (error.message === 'E_ROW_NOT_FOUND') {
+      if (error.code === 'E_ROW_NOT_FOUND') {
         this.res.code = 404
         this.res.status = 'Not Found'
         this.res.message = 'Definition not found'
