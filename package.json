@@ -7,9 +7,6 @@
     "start": "node ace serve --watch",
     "start:prod": "node ./build/server.js"
   },
-  "engines": {
-    "node": "v16.13.0"
-  },
   "eslintConfig": {
     "extends": [
       "plugin:adonis/typescriptApp",
