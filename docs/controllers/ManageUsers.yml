@@ -1,0 +1,81 @@
+/users:
+  get:
+    tags:
+      - Manage Users
+    summary: Get All Users
+    security:
+      - bearerAuth: []
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success
+
+/users/{id}:
+  get:
+    tags:
+      - Manage Users
+    summary: Get User By Id
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+        description: Numeric ID of User
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success
+  delete:
+    tags:
+      - Manage Users
+    summary: Soft Delete User By Id
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+        description: Numeric ID of User
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success
+
+/users/{id}/role:
+  put:
+    tags:
+      - Manage Users
+    summary: Update Role User By Id
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+        description: Numeric ID of User
+    requestBody:
+      description: 1 for Admin, 2 for User
+      required: true
+      content:
+        application/json:
+          schema:
+            properties:
+              role_id:
+                type: integer
+                example: 1
+                required: true
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success
