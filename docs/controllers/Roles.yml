@@ -1,0 +1,12 @@
+/roles:
+  get:
+    tags:
+      - Roles
+    summary: Get All Roles
+    security:
+      - bearerAuth: []
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success
