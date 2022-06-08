@@ -194,7 +194,10 @@ export default class DefinitionsController {
     const { id }: Record<string, number> = params
 
     try {
-      const definition: Definition = await Definition.findOrFail(id)
+      const definition: Definition = await Definition.query()
+        .where('id', id)
+        .whereNot('status_definition_id', StatusDefinitions.DELETED)
+        .firstOrFail()
 
       definition.statusDefinitionId = StatusDefinitions.DELETED
       definition.deletedAt = DateTime.local()
