@@ -1,0 +1,67 @@
+/login:
+  post:
+    tags:
+      - Auth
+    summary: Login User
+    requestBody:
+      description: 'optional'
+      required: true
+      content:
+        application/json:
+          schema:
+            properties:
+              email:
+                type: string
+                example: 'user1@user.com'
+                required: true
+              password:
+                type: string
+                example: 'userpass'
+                required: true
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success
+
+/register:
+  post:
+    tags:
+      - Auth
+    summary: Register user
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            properties:
+              username:
+                type: string
+                example: 'user1'
+                required: true
+              email:
+                type: string
+                example: 'user1@user.com'
+                required: true
+              password:
+                type: string
+                example: 'userpass'
+                required: true
+    produces:
+      - application/json
+    responses:
+      201:
+        description: Success
+
+/logout:
+  get:
+    tags:
+      - Auth
+    security:
+      - bearerAuth: []
+    summary: Logout user
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success
