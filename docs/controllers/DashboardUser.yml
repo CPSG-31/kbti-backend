@@ -1,0 +1,12 @@
+/dashboard:
+  get:
+    tags:
+      - Dashboard User
+    summary: Dashboard User for Create, Edit, and Delete Their Definitions
+    security:
+      - bearerAuth: []
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success
