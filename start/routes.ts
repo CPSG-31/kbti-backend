@@ -31,14 +31,13 @@ Route.get('/categories', 'CategoriesController.index')
 Route.get('/search', 'SearchController.index')
 Route.get('/definitions', 'DefinitionsController.index')
 
-Route.post('/definitions/:id/votes', 'VotesController.store').middleware('auth')
-
 Route.group(() => {
   Route.get('/dashboard', 'DashboardUsersController.index')
   Route.get('/definitions/:id', 'DefinitionsController.show')
   Route.post('/definitions', 'DefinitionsController.store')
   Route.put('/definitions/:id', 'DefinitionsController.update')
   Route.delete('/definitions/:id', 'DefinitionsController.destroy')
+  Route.post('/definitions/:id/votes', 'DefinitionsController.storeVote')
 }).middleware('auth')
 
 Route.group(() => {
