@@ -1,5 +1,5 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { createResponse, getUnixTimestamp } from 'App/Helpers/Customs'
+import { createResponse, getUnixTimestamp, getTotalDownVotes } from 'App/Helpers/Customs'
 import Definition from 'App/Models/Definition'
 import User from 'App/Models/User'
 import CreateDefinitionValidator from 'App/Validators/CreateDefinitionValidator'
@@ -39,6 +39,7 @@ export default class DefinitionsController {
           totalVotes,
           totalUpVotes,
           createdAt,
+          updatedAt,
         }: Definition = data
 
         return {
@@ -47,9 +48,10 @@ export default class DefinitionsController {
           definition,
           category: category.category,
           username: user.username,
-          total_votes: totalVotes,
           up_votes: totalUpVotes || 0,
+          down_votes: getTotalDownVotes(totalVotes, totalUpVotes),
           created_at: getUnixTimestamp(createdAt),
+          updated_at: getUnixTimestamp(updatedAt),
         }
       })
 
@@ -93,8 +95,8 @@ export default class DefinitionsController {
         definition,
         category: category.category,
         username: username,
-        total_votes: totalVotes,
         up_votes: totalUpVotes || 0,
+        down_votes: getTotalDownVotes(totalVotes, totalUpVotes),
         created_at: getUnixTimestamp(createdAt),
         updated_at: getUnixTimestamp(updatedAt),
       }
