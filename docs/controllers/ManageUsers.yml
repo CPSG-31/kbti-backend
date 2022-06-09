@@ -9,7 +9,11 @@
       - application/json
     responses:
       200:
-        description: Success
+        description: Success get all users
+      401:
+        description: Unauthorized
+      404:
+        description: Users not found
 
 /users/{id}:
   get:
@@ -29,7 +33,11 @@
       - application/json
     responses:
       200:
-        description: Success
+        description: Success get user by id
+      401:
+        description: Unauthorized
+      404:
+        description: User not found
   delete:
     tags:
       - Manage Users
@@ -47,7 +55,11 @@
       - application/json
     responses:
       200:
-        description: Success
+        description: Success soft delete user by id
+      401:
+        description: Unauthorized
+      404:
+        description: User not found
 
 /users/{id}/role:
   put:
@@ -78,4 +90,8 @@
       - application/json
     responses:
       200:
-        description: Success
+        description: Success update role user by id
+      401:
+        description: Unauthorized
+      404:
+        description: User not found

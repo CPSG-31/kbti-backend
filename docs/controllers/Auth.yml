@@ -21,8 +21,11 @@
       - application/json
     responses:
       200:
-        description: Success
-
+        description: Success login
+      422:
+        description: Email and password must be filled
+      500:
+        description: Internal server error
 /register:
   post:
     tags:
@@ -50,7 +53,9 @@
       - application/json
     responses:
       201:
-        description: Success
+        description: Success register
+      422:
+        description: Email or username already exists
 
 /logout:
   get:
@@ -63,4 +68,6 @@
       - application/json
     responses:
       200:
-        description: Success
+        description: Success logout
+      401:
+        description: Unauthorized

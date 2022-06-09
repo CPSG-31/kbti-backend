@@ -7,7 +7,9 @@
       - application/json
     responses:
       200:
-        description: Success
+        description: Success get newly added terms
+      404:
+        description: Terms not found
 
 /terms/random:
   get:
@@ -18,4 +20,6 @@
       - application/json
     responses:
       200:
-        description: Success
+        description: Success get random terms & definitions
+      404:
+        description: Terms not found

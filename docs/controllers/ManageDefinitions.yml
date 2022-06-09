@@ -15,7 +15,11 @@
       - application/json
     responses:
       200:
-        description: Success
+        description: Success get definitions by status accepted or rejected
+      401:
+        description: Unauthorized
+      404:
+        description: Definitions not found
 
 /admin/definitions/review:
   get:
@@ -34,7 +38,11 @@
       - application/json
     responses:
       200:
-        description: Success
+        description: Success get definitions that need to be review
+      401:
+        description: Unauthorized
+      404:
+        description: Definitions not found
 
 /admin/definitions/{id}/review:
   put:
@@ -65,7 +73,11 @@
       - application/json
     responses:
       200:
-        description: Success
+        description: Success accept or reject definition
+      401:
+        description: Unauthorized
+      404:
+        description: Definition not found
 
 /admin/definitions/deleted:
   get:
@@ -78,7 +90,11 @@
       - application/json
     responses:
       200:
-        description: Success
+        description: Success get all deleted definitions by user
+      401:
+        description: Unauthorized
+      404:
+        description: Definitions not found
 
 /admin/definitions/{id}/delete:
   delete:
@@ -98,4 +114,8 @@
       - application/json
     responses:
       200:
-        description: Success
+        description: Success delete permanent definition
+      401:
+        description: Unauthorized
+      404:
+        description: Definition not found

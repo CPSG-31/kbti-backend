@@ -2,7 +2,7 @@
   get:
     tags:
       - Search
-    summary: Search terms or definitions
+    summary: Search terms
     parameters:
       - in: query
         name: q
@@ -13,4 +13,6 @@
       - application/json
     responses:
       200:
-        description: Success
+        description: Success search terms by query
+      404:
+        description: Terms not found
