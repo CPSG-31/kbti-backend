@@ -6,10 +6,7 @@
     "build": "node ace build --prod",
     "start": "node ace serve --watch",
     "start:prod": "node ./build/server.js",
-    "lint": "eslint . --ext=.ts",
-    "lint-fix": "eslint . --ext=.ts --fix",
-    "format": "prettier --write .",
-    "migration": "node ace migration:fresh"
+    "postbuild": "cp -a docs/ build/docs"
   },
   "eslintConfig": {
     "extends": [
