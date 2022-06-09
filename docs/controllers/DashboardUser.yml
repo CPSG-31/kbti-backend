@@ -9,4 +9,6 @@
       - application/json
     responses:
       200:
-        description: Success
+        description: Success definitions list by user login
+      401:
+        description: Unauthorized
