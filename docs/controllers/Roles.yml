@@ -1,0 +1,16 @@
+/roles:
+  get:
+    tags:
+      - Roles
+    summary: Get All Roles
+    security:
+      - bearerAuth: []
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success get all roles
+      401:
+        description: Unauthorized
+      404:
+        description: Roles not found

@@ -1,0 +1,97 @@
+/users:
+  get:
+    tags:
+      - Manage Users
+    summary: Get All Users
+    security:
+      - bearerAuth: []
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success get all users
+      401:
+        description: Unauthorized
+      404:
+        description: Users not found
+
+/users/{id}:
+  get:
+    tags:
+      - Manage Users
+    summary: Get User By Id
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+        description: Numeric ID of User
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success get user by id
+      401:
+        description: Unauthorized
+      404:
+        description: User not found
+  delete:
+    tags:
+      - Manage Users
+    summary: Soft Delete User By Id
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+        description: Numeric ID of User
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success soft delete user by id
+      401:
+        description: Unauthorized
+      404:
+        description: User not found
+
+/users/{id}/role:
+  put:
+    tags:
+      - Manage Users
+    summary: Update Role User By Id
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+        description: Numeric ID of User
+    requestBody:
+      description: 1 for Admin, 2 for User
+      required: true
+      content:
+        application/json:
+          schema:
+            properties:
+              role_id:
+                type: integer
+                example: 1
+                required: true
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success update role user by id
+      401:
+        description: Unauthorized
+      404:
+        description: User not found

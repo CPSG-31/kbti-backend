@@ -1,0 +1,25 @@
+/terms/new:
+  get:
+    tags:
+      - Terms
+    summary: Get Newly Added Terms
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success get newly added terms
+      404:
+        description: Terms not found
+
+/terms/random:
+  get:
+    tags:
+      - Terms
+    summary: Get Random Terms & Definitions
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success get random terms & definitions
+      404:
+        description: Terms not found
