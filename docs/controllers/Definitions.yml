@@ -1,0 +1,155 @@
+/definitions:
+  get:
+    tags:
+      - Definitions
+    summary: Get List of Definitions By Term or Category Id
+    parameters:
+      - in: query
+        name: term
+        schema:
+          type: string
+        description: Term you want to search
+      - in: query
+        name: categoryId
+        schema:
+          type: integer
+        description: Category Id of Definitions
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success
+  post:
+    tags:
+      - Definitions
+    summary: Create a Definition
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            properties:
+              term:
+                type: string
+                example: 'HDMI'
+                required: true
+              definition:
+                type: string
+                example: 'High-Definition Multimedia Interface adalah salah satu antarmuka peralatan audio/video digital ...'
+                required: true
+              category_id:
+                type: integer
+                example: 3
+                required: true
+    produces:
+      - application/json
+    responses:
+      201:
+        description: Success
+
+/definitions/{id}:
+  get:
+    tags:
+      - Definitions
+    summary: Get Definition By Id
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+        description: Numeric ID of Definition
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success
+  put:
+    tags:
+      - Definitions
+    summary: Update a Definition By Id
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+        description: Numeric ID of Definition
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            properties:
+              term:
+                type: string
+                example: 'HDMI Gen 4.1'
+                required: true
+              definition:
+                type: string
+                example: 'High-Definition Multimedia Interface adalah salah satu antarmuka peralatan audio/video digital ...'
+                required: true
+              category_id:
+                type: integer
+                example: 3
+                required: true
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success
+  delete:
+    tags:
+      - Definitions
+    summary: Soft Delete a Definition
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+        description: Numeric ID of Definition
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success
+
+/definitions/{id}/votes:
+  post:
+    tags:
+      - Definitions
+    summary: Votting a definition
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+        description: Numeric ID of Definition
+    requestBody:
+      description: True for Up Vote and False for Down Vote
+      required: true
+      content:
+        application/json:
+          schema:
+            properties:
+              is_upvote:
+                type: string
+                example: true
+                required: true
+    produces:
+      - application/json
+    responses:
+      201:
+        description: Success

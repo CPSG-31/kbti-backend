@@ -1,0 +1,16 @@
+/search:
+  get:
+    tags:
+      - Search
+    summary: Search terms or definitions
+    parameters:
+      - in: query
+        name: q
+        schema:
+          type: string
+        description: The *, letter, or word of terms to find
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Success
