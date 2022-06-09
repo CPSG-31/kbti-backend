@@ -39,8 +39,9 @@ export default class UsersController {
   }
 
   public async show({ params, response }: HttpContextContract): Promise<void> {
+    const { id: userId }: Record<string, number> = params
     try {
-      const user: User = await User.query().preload('role').where('id', params.id).firstOrFail()
+      const user: User = await User.query().preload('role').where('id', userId).firstOrFail()
 
       this.res.data = {
         id: user.id,
@@ -70,8 +71,12 @@ export default class UsersController {
   }
 
   public async destroy({ params, response }: HttpContextContract): Promise<void> {
+    const { id: userId }: Record<string, number> = params
     try {
-      const user: User = await User.query().where('id', params.id).firstOrFail()
+      const user: User = await User.query()
+        .where('id', userId)
+        .whereNot('is_active', false)
+        .firstOrFail()
 
       user.isActive = false
 
