@@ -7,4 +7,6 @@
       - application/json
     responses:
       200:
-        description: Success
+        description: Success get all categories
+      404:
+        description: Categories not found
