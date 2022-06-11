@@ -82,6 +82,7 @@ export default class DefinitionsController {
 
       const {
         id,
+        categoryId,
         term,
         definition,
         category,
@@ -95,6 +96,7 @@ export default class DefinitionsController {
         id,
         term,
         definition,
+        category_id: categoryId,
         category: category.category,
         username: username,
         up_votes: totalUpVotes || 0,
