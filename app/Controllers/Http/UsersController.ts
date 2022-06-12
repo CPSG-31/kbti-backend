@@ -1,24 +1,33 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
 import { createResponse, getUnixTimestamp } from 'App/Helpers/Customs'
+import { ModelPaginatorContract } from '@ioc:Adonis/Lucid/Orm'
 
 export default class UsersController {
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
+  protected LIMIT_PAGINATION = 10
 
-  public async index({ response }: HttpContextContract): Promise<void> {
+  public async index({ request, response }: HttpContextContract): Promise<void> {
+    const page = request.input('page', 1)
     try {
-      const users: User[] = await User.query().preload('role')
+      const usersPaginator: ModelPaginatorContract<User> = await User.query()
+        .preload('role')
+        .where('is_active', true)
+        .paginate(page, this.LIMIT_PAGINATION)
 
-      this.res.data = users.map((user) => {
+      const { meta, data: users } = usersPaginator.serialize()
+
+      if (!users.length) {
+        throw new Error('Users not found')
+      }
+
+      this.res.meta = meta
+      this.res.data = users.map((data) => {
         return {
-          id: user.id,
-          role_id: user.roleId,
-          role_name: user.role.roleName,
-          username: user.username,
-          email: user.email,
-          is_active: user.isActive,
-          createad_at: getUnixTimestamp(user.createdAt),
-          updated_at: getUnixTimestamp(user.updatedAt),
+          id: data.id,
+          username: data.username,
+          role_name: data.role.role_name,
+          email: data.email,
         }
       })
 
@@ -28,7 +37,7 @@ export default class UsersController {
       this.res.status = 'Error'
       this.res.message = 'Internal Server Error'
 
-      if (error.code === 'E_ROW_NOT_FOUND') {
+      if (error.code === 'E_ROW_NOT_FOUND' || error.message === 'Users not found') {
         this.res.code = 404
         this.res.status = 'Not Found'
         this.res.message = 'Users not found'
@@ -49,9 +58,6 @@ export default class UsersController {
         role_name: user.role.roleName,
         username: user.username,
         email: user.email,
-        is_active: user.isActive,
-        createad_at: getUnixTimestamp(user.createdAt),
-        updated_at: getUnixTimestamp(user.updatedAt),
       }
 
       return response.status(this.res.code).json(this.res)
