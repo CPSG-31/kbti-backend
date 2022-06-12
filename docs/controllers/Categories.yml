@@ -3,8 +3,6 @@
     tags:
       - Categories
     summary: Get All Categories
-    produces:
-      - application/json
     responses:
       200:
         description: Success get all categories

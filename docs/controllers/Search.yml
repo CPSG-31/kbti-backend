@@ -9,8 +9,6 @@
         schema:
           type: string
         description: The *, letter, or word of terms to find
-    produces:
-      - application/json
     responses:
       200:
         description: Success search terms by query
