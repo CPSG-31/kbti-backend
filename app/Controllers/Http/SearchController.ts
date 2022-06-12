@@ -49,14 +49,17 @@ export default class SearchController {
         ? Definition.query()
             .distinct('term')
             .where('status_definition_id', StatusDefinitions.APPROVED)
+            .orderBy('updated_at', 'desc')
         : Definition.query()
             .where('term', 'like', `${query}%`)
             .distinct('term')
             .where('status_definition_id', StatusDefinitions.APPROVED)
+            .orderBy('term')
     }
     return Definition.query()
       .where('term', 'like', `%${query}%`)
       .distinct('term')
       .where('status_definition_id', StatusDefinitions.APPROVED)
+      .orderBy('term')
   }
 }

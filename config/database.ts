@@ -20,7 +20,7 @@ const databaseConfig: DatabaseConfig = {
   |
   */
   connection: Env.get('DB_CONNECTION'),
-
+  // connection: Application.inDev ? 'sqlite' : 'mysql',
   connections: {
     /*
     |--------------------------------------------------------------------------

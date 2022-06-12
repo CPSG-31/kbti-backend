@@ -3,14 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "node ace serve --watch",
-    "build": "node ace build --production",
-    "start": "node server.js",
-    "lint": "eslint . --ext=.ts",
-    "lint-fix": "eslint . --ext=.ts --fix",
-    "format": "prettier --write .",
-    "migration": "node ace migration:fresh",
-    "docs": "node ace swagger:generate"
+    "build": "node ace build --prod && node ace swagger:generate",
+    "start": "node ace serve --watch",
+    "start:prod": "node ./build/server.js",
+    "postbuild": "cp -a docs/ build/docs"
   },
   "eslintConfig": {
     "extends": [
