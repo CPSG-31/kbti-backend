@@ -82,7 +82,6 @@
               role_id:
                 type: integer
                 example: 1
-                required: true
     responses:
       200:
         description: Success update role user by id
