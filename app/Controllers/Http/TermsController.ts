@@ -1,6 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Definition from 'App/Models/Definition'
-import { createResponse, getUnixTimestamp } from 'App/Helpers/Customs'
+import { createResponse, getTotalDownVotes, getUnixTimestamp } from 'App/Helpers/Customs'
 import StatusDefinitions from 'App/Enums/StatusDefinitions'
 
 export default class TermsController {
@@ -39,7 +39,13 @@ export default class TermsController {
 
   public async getRandomDefinitions({ response }: HttpContextContract): Promise<void> {
     try {
-      const definitions = await Definition.query()
+      const definitions: Definition[] = await Definition.query()
+        .withCount('vote', (query) => {
+          query.as('total_votes')
+        })
+        .withAggregate('vote', (query) => {
+          query.sum('is_upvote').as('total_up_votes')
+        })
         .preload('user')
         .preload('category')
         .where('status_definition_id', StatusDefinitions.APPROVED)
@@ -52,7 +58,17 @@ export default class TermsController {
       }
 
       this.res.data = definitions.map((data) => {
-        const { id, term, definition, user, category, createdAt, updatedAt } = data
+        const {
+          id,
+          term,
+          definition,
+          user,
+          category,
+          totalVotes,
+          totalUpVotes,
+          createdAt,
+          updatedAt,
+        } = data
 
         return {
           id,
@@ -60,6 +76,8 @@ export default class TermsController {
           definition,
           category: category.category,
           username: user.username,
+          up_votes: totalUpVotes || 0,
+          down_votes: getTotalDownVotes(totalVotes, totalUpVotes),
           created_at: getUnixTimestamp(createdAt),
           updated_at: getUnixTimestamp(updatedAt),
         }
