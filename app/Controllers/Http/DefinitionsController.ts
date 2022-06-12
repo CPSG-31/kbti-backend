@@ -237,6 +237,7 @@ export default class DefinitionsController {
       .preload('category')
       .where('status_definition_id', StatusDefinitions.APPROVED)
       .where('categoryId', categoryId)
+      .orderBy('updated_at', 'desc')
   }
 
   private getDefinitionsByTerm(term: string): Promise<Definition[]> {
@@ -253,6 +254,7 @@ export default class DefinitionsController {
       .preload('category')
       .where('status_definition_id', StatusDefinitions.APPROVED)
       .where('term', 'like', `%${term}%`)
+      .orderBy('term')
   }
 
   private getDefinitionById(id: number): Promise<Definition> {
@@ -266,6 +268,7 @@ export default class DefinitionsController {
       .preload('category')
       .where('id', id)
       .whereNot('status_definition_id', StatusDefinitions.DELETED)
+      .orderBy('term')
       .firstOrFail()
   }
 
