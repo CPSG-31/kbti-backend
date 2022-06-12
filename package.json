@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "node ace build --prod",
+    "build": "node ace build --prod && node ace swagger:generate",
     "start": "node ace serve --watch",
     "start:prod": "node ./build/server.js",
     "postbuild": "cp -a docs/ build/docs"
