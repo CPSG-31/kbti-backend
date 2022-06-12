@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "node ace build --prod && node ace swagger:generate",
+    "build": "node ace build --prod",
     "start": "node ace serve --watch",
     "start:prod": "node ./build/server.js",
-    "postbuild": "cp -a docs/ build/docs"
+    "postbuild": "node ace swagger:generate && cp -a docs/ build/docs"
   },
   "eslintConfig": {
     "extends": [
