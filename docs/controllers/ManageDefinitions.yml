@@ -11,8 +11,6 @@
         schema:
           type: integer
         description: Page Number of Definitions
-    produces:
-      - application/json
     responses:
       200:
         description: Success get definitions by status accepted or rejected
@@ -34,8 +32,6 @@
         schema:
           type: integer
         description: Page Number of Definitions
-    produces:
-      - application/json
     responses:
       200:
         description: Success get definitions that need to be review
@@ -64,13 +60,13 @@
       content:
         application/json:
           schema:
+            type: object
+            required:
+              - status_definitions_id
             properties:
               status_definitions_id:
                 type: integer
                 example: 2
-                required: true
-    produces:
-      - application/json
     responses:
       200:
         description: Success accept or reject definition
@@ -86,8 +82,6 @@
     summary: Get All Deleted Definitions
     security:
       - bearerAuth: []
-    produces:
-      - application/json
     responses:
       200:
         description: Success get all deleted definitions by user
@@ -110,8 +104,6 @@
           type: integer
         required: true
         description: Numeric ID of Definition
-    produces:
-      - application/json
     responses:
       200:
         description: Success delete permanent definition

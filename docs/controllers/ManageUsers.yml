@@ -5,8 +5,6 @@
     summary: Get All Users
     security:
       - bearerAuth: []
-    produces:
-      - application/json
     responses:
       200:
         description: Success get all users
@@ -29,8 +27,6 @@
           type: integer
         required: true
         description: Numeric ID of User
-    produces:
-      - application/json
     responses:
       200:
         description: Success get user by id
@@ -51,8 +47,6 @@
           type: integer
         required: true
         description: Numeric ID of User
-    produces:
-      - application/json
     responses:
       200:
         description: Success soft delete user by id
@@ -81,13 +75,14 @@
       content:
         application/json:
           schema:
+            type: object
+            required:
+              - role_id
             properties:
               role_id:
                 type: integer
                 example: 1
                 required: true
-    produces:
-      - application/json
     responses:
       200:
         description: Success update role user by id

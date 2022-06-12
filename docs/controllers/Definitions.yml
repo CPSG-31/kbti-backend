@@ -14,8 +14,6 @@
         schema:
           type: integer
         description: Category Id of Definitions
-    produces:
-      - application/json
     responses:
       200:
         description: Success get list of definitions
@@ -34,21 +32,21 @@
       content:
         application/json:
           schema:
+            type: object
+            required:
+              - term
+              - definition
+              - category_id
             properties:
               term:
                 type: string
                 example: 'HDMI'
-                required: true
               definition:
                 type: string
                 example: 'High-Definition Multimedia Interface adalah salah satu antarmuka peralatan audio/video digital ...'
-                required: true
               category_id:
                 type: integer
                 example: 3
-                required: true
-    produces:
-      - application/json
     responses:
       201:
         description: Success create definition
@@ -71,8 +69,6 @@
           type: integer
         required: true
         description: Numeric ID of Definition
-    produces:
-      - application/json
     responses:
       200:
         description: Success get definition by id
@@ -99,21 +95,21 @@
       content:
         application/json:
           schema:
+            type: object
+            required:
+              - term
+              - definition
+              - category_id
             properties:
               term:
                 type: string
                 example: 'HDMI Gen 4.1'
-                required: true
               definition:
                 type: string
                 example: 'High-Definition Multimedia Interface adalah salah satu antarmuka peralatan audio/video digital ...'
-                required: true
               category_id:
                 type: integer
                 example: 3
-                required: true
-    produces:
-      - application/json
     responses:
       200:
         description: Success update definition by id
@@ -136,8 +132,6 @@
           type: integer
         required: true
         description: Numeric ID of Definition
-    produces:
-      - application/json
     responses:
       200:
         description: Success soft delete definition by id
@@ -166,13 +160,14 @@
       content:
         application/json:
           schema:
+            type: object
+            required:
+              - is_upvote
             properties:
               is_upvote:
                 type: string
                 example: true
                 required: true
-    produces:
-      - application/json
     responses:
       201:
         description: Success voting definition

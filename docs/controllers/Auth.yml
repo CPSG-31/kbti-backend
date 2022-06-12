@@ -8,17 +8,17 @@
       content:
         application/json:
           schema:
+            type: object
+            required:
+              - email
+              - password
             properties:
               email:
                 type: string
                 example: 'user1@user.com'
-                required: true
               password:
                 type: string
                 example: 'userpass'
-                required: true
-    produces:
-      - application/json
     responses:
       200:
         description: Success login
@@ -26,6 +26,7 @@
         description: Email and password must be filled
       500:
         description: Internal server error
+
 /register:
   post:
     tags:
@@ -36,21 +37,21 @@
       content:
         application/json:
           schema:
+            type: object
+            required:
+              - username
+              - email
+              - password
             properties:
               username:
                 type: string
                 example: 'user1'
-                required: true
               email:
                 type: string
                 example: 'user1@user.com'
-                required: true
               password:
                 type: string
                 example: 'userpass'
-                required: true
-    produces:
-      - application/json
     responses:
       201:
         description: Success register
@@ -64,8 +65,6 @@
     security:
       - bearerAuth: []
     summary: Logout user
-    produces:
-      - application/json
     responses:
       200:
         description: Success logout
