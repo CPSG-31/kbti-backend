@@ -3,8 +3,6 @@
     tags:
       - Terms
     summary: Get Newly Added Terms
-    produces:
-      - application/json
     responses:
       200:
         description: Success get newly added terms
@@ -16,8 +14,6 @@
     tags:
       - Terms
     summary: Get Random Terms & Definitions
-    produces:
-      - application/json
     responses:
       200:
         description: Success get random terms & definitions
