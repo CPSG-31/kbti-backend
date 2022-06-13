@@ -1,6 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
-import { createResponse, getUnixTimestamp } from 'App/Helpers/Customs'
+import { createResponse } from 'App/Helpers/Customs'
 import { ModelPaginatorContract } from '@ioc:Adonis/Lucid/Orm'
 
 export default class UsersController {
