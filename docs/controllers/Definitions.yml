@@ -140,11 +140,11 @@
       401:
         description: Unauthorized
 
-/definitions/{id}/votes:
+/definitions/{id}/vote:
   post:
     tags:
       - Definitions
-    summary: Votting a definition
+    summary: Voting a definition
     security:
       - bearerAuth: []
     parameters:
