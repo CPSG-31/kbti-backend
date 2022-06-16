@@ -293,8 +293,26 @@ export default class DefinitionsController {
         }
       )
 
-      this.res.code = 201
+      const definition = await Definition.query()
+        .withCount('vote', (query) => {
+          query.as('total_votes')
+        })
+        .withAggregate('vote', (query) => {
+          query.sum('is_upvote').as('total_up_votes')
+        })
+        .where('id', definitionId)
+        .where('status_definition_id', StatusDefinitions.APPROVED)
+        .firstOrFail()
+
+      const { id, totalVotes, totalUpVotes }: Definition = definition
+      const vote = {
+        vote_id: id,
+        up_votes: totalUpVotes || 0,
+        down_votes: getTotalDownVotes(totalVotes, totalUpVotes),
+      }
+
       this.res.message = 'Definition voted'
+      this.res.data = vote
 
       return response.status(this.res.code).json(this.res)
     } catch (error: any) {
