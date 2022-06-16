@@ -20,7 +20,7 @@ export default class AuthController {
         .where('isActive', true)
         .firstOrFail()
       const token: OpaqueTokenContract<User> = await auth.use('api').attempt(email, password, {
-        expiresIn: '2hours',
+        expiresIn: '24hours',
       })
 
       this.res.data = {
