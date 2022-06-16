@@ -15,7 +15,10 @@ export default class AuthController {
         throw new Error('Email and password are required')
       }
 
-      const user: User = await User.findByOrFail('email', email)
+      const user: User = await User.query()
+        .where('email', email)
+        .where('isActive', true)
+        .firstOrFail()
       const token: OpaqueTokenContract<User> = await auth.use('api').attempt(email, password, {
         expiresIn: '2hours',
       })
