@@ -7,8 +7,10 @@ import UpdateRoleValidator from 'App/Validators/UpdateRoleValidator'
 export default class UserRolesController {
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
 
-  public async update({ request, params, response }: HttpContextContract): Promise<void> {
+  public async update({ request, params, response, bouncer }: HttpContextContract): Promise<void> {
     try {
+      await bouncer.with('UserRolePolicy').authorize('updateUserRole')
+
       const userId: number = params.id
       const { role_id: roleId }: { role_id: number } = await request.validate(UpdateRoleValidator)
 
@@ -42,6 +44,12 @@ export default class UserRolesController {
         this.res.code = 404
         this.res.status = 'Not Found'
         this.res.message = 'User or role not found'
+      }
+
+      if (error.code === 'E_AUTHORIZATION_FAILURE') {
+        this.res.code = 403
+        this.res.status = 'Forbidden'
+        this.res.message = "You can't perform this action"
       }
 
       return response.status(this.res.code).json(this.res)
