@@ -19,7 +19,9 @@ export default class ManageDefinitionsController {
         .preload('statusDefinition')
         .where('status_definition_id', StatusDefinitions.APPROVED)
         .orWhere('status_definition_id', StatusDefinitions.REJECTED)
+        .orderBy('updated_at', 'desc')
         .paginate(page, this.LIMIT_PAGINATION)
+
       const { meta, data: definitions } = definitionsPaginator.serialize()
 
       if (!definitions.length) {
@@ -73,6 +75,7 @@ export default class ManageDefinitionsController {
         .preload('user')
         .preload('statusDefinition')
         .where('status_definition_id', StatusDefinitions.REVIEW)
+        .orderBy('updated_at', 'desc')
         .paginate(page, this.LIMIT_PAGINATION)
 
       const { meta, data: definitions } = definitionsPaginator.serialize()
@@ -176,6 +179,7 @@ export default class ManageDefinitionsController {
         .preload('category')
         .preload('statusDefinition')
         .where('status_definition_id', StatusDefinitions.DELETED)
+        .orderBy('deleted_at', 'desc')
         .paginate(page, this.LIMIT_PAGINATION)
 
       const { meta, data: definitions } = definitionsPaginator.serialize()

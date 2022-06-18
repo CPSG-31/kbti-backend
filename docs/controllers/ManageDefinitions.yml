@@ -62,9 +62,9 @@
           schema:
             type: object
             required:
-              - status_definitions_id
+              - status_definition_id
             properties:
-              status_definitions_id:
+              status_definition_id:
                 type: integer
                 example: 2
     responses:
