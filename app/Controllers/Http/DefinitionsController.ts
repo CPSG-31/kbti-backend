@@ -73,7 +73,7 @@ export default class DefinitionsController {
     }
   }
 
-  public async show({ params, response, auth, bouncer }: HttpContextContract): Promise<void> {
+  public async show({ params, response, auth }: HttpContextContract): Promise<void> {
     const { id: definitionId }: Record<string, number> = params
     const { username }: User = auth.user!
 
