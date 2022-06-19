@@ -7,9 +7,11 @@ export default class UsersController {
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
   protected LIMIT_PAGINATION = 10
 
-  public async index({ request, response }: HttpContextContract): Promise<void> {
+  public async index({ request, response, bouncer }: HttpContextContract): Promise<void> {
     const page = request.input('page', 1)
     try {
+      await bouncer.with('UserPolicy').authorize('getAllUsers')
+
       const usersPaginator: ModelPaginatorContract<User> = await User.query()
         .preload('role')
         .where('is_active', true)
@@ -43,13 +45,21 @@ export default class UsersController {
         this.res.message = 'Users not found'
       }
 
+      if (error.code === 'E_AUTHORIZATION_FAILURE') {
+        this.res.code = 403
+        this.res.status = 'Forbidden'
+        this.res.message = "You can't perform this action"
+      }
+
       return response.status(this.res.code).json(this.res)
     }
   }
 
-  public async show({ params, response }: HttpContextContract): Promise<void> {
+  public async show({ params, response, bouncer }: HttpContextContract): Promise<void> {
     const { id: userId }: Record<string, number> = params
     try {
+      await bouncer.with('UserPolicy').authorize('getUserById')
+
       const user: User = await User.query().preload('role').where('id', userId).firstOrFail()
 
       this.res.data = {
@@ -72,13 +82,21 @@ export default class UsersController {
         this.res.message = 'User not found'
       }
 
+      if (error.code === 'E_AUTHORIZATION_FAILURE') {
+        this.res.code = 403
+        this.res.status = 'Forbidden'
+        this.res.message = "You can't perform this action"
+      }
+
       return response.status(this.res.code).json(this.res)
     }
   }
 
-  public async destroy({ params, response }: HttpContextContract): Promise<void> {
+  public async destroy({ params, response, bouncer }: HttpContextContract): Promise<void> {
     const { id: userId }: Record<string, number> = params
     try {
+      await bouncer.with('UserPolicy').authorize('deleteUserById')
+
       const user: User = await User.query()
         .where('id', userId)
         .whereNot('is_active', false)
@@ -100,6 +118,12 @@ export default class UsersController {
         this.res.code = 404
         this.res.status = 'Not Found'
         this.res.message = 'User not found'
+      }
+
+      if (error.code === 'E_AUTHORIZATION_FAILURE') {
+        this.res.code = 403
+        this.res.status = 'Forbidden'
+        this.res.message = "You can't perform this action"
       }
 
       return response.status(this.res.code).json(this.res)
