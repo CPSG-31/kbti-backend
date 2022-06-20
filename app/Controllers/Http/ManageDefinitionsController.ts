@@ -2,8 +2,10 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { createResponse, getUnixTimestamp } from 'App/Helpers/Customs'
 import Definition from 'App/Models/Definition'
 import StatusDefinitions from 'App/Enums/StatusDefinitions'
+import Roles from 'App/Enums/Roles'
 import ReviewDefinitionValidator from 'App/Validators/ReviewDefinitionValidator'
 import { ModelPaginatorContract } from '@ioc:Adonis/Lucid/Orm'
+import Database from '@ioc:Adonis/Lucid/Database'
 
 export default class ManageDefinitionsController {
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
@@ -256,5 +258,53 @@ export default class ManageDefinitionsController {
 
       return response.status(this.res.code).json(this.res)
     }
+  }
+
+  public async statistics({ response }: HttpContextContract): Promise<void> {
+    try {
+      const totaldefinitionReview: any = await this.getTotalDefinition(StatusDefinitions.REVIEW)
+
+      const totaldefinitionApproved: any = await this.getTotalDefinition(StatusDefinitions.APPROVED)
+
+      const totaldefinitionRejected: any = await this.getTotalDefinition(StatusDefinitions.REJECTED)
+
+      const totaldefinitionDeleted: any = await this.getTotalDefinition(StatusDefinitions.DELETED)
+
+      const totalUsers: any = await this.getTotalUser(Roles.USER)
+
+      const totalAdmin: any = await this.getTotalUser(Roles.ADMIN)
+
+      this.res.data = {
+        definition_review: totaldefinitionReview?.total,
+        definition_approved: totaldefinitionApproved?.total,
+        definition_rejected: totaldefinitionRejected?.total,
+        definition_deleted: totaldefinitionDeleted?.total,
+        users: totalUsers?.total,
+        admin: totalAdmin?.total,
+      }
+
+      return response.status(this.res.code).json(this.res)
+    } catch (error: any) {
+      this.res.code = 500
+      this.res.status = 'Error'
+      this.res.message = 'Internal server error'
+
+      return response.status(this.res.code).json(this.res)
+    }
+  }
+
+  private async getTotalDefinition(statusId: number): Promise<any> {
+    return Database.from('definitions')
+      .count('* as total')
+      .where('status_definition_id', statusId)
+      .first()
+  }
+
+  private async getTotalUser(roleId: number): Promise<any> {
+    return Database.from('users')
+      .count('* as total')
+      .where('is_active', true)
+      .andWhere('role_id', roleId)
+      .first()
   }
 }

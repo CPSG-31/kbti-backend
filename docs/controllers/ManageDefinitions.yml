@@ -111,3 +111,18 @@
         description: Unauthorized
       404:
         description: Definition not found
+
+/admin/statistics:
+  get:
+    tags:
+      - Statistics definitions and users
+    summary: Get total data definitions and users
+    security:
+      - bearerAuth: []
+    responses:
+      200:
+        description: Success get all deleted definitions by user
+      401:
+        description: Unauthorized
+      500:
+        description: Internal Server Error
