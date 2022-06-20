@@ -51,6 +51,7 @@ Route.group(() => {
   Route.put('/definitions/:id/review', 'ManageDefinitionsController.reviewDefinitions')
   Route.get('/definitions/deleted', 'ManageDefinitionsController.getDeletedDefinitions')
   Route.delete('/definitions/:id/delete', 'ManageDefinitionsController.destroy')
+  Route.get('/statistics', 'ManageDefinitionsController.statistics')
 })
   .middleware('auth')
   .prefix('/admin')
