@@ -70,3 +70,16 @@
         description: Success logout
       401:
         description: Unauthorized
+
+/auth/token:
+  get:
+    tags:
+      - Auth
+    security:
+      - bearerAuth: []
+    summary: Get Token Information
+    responses:
+      200:
+        description: Success get token info
+      500:
+        description: Internal server error

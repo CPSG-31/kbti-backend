@@ -8,10 +8,11 @@ import StatusDefinitions from 'App/Enums/StatusDefinitions'
 export default class DashboardUsersController {
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
 
-  public async index({ response, auth }: HttpContextContract): Promise<void> {
+  public async index({ response, auth, bouncer }: HttpContextContract): Promise<void> {
     const { id: userId, username, email }: User = auth.user!
-
     try {
+      await bouncer.with('DashboardUserPolicy').authorize('view')
+
       const definitions: Definition[] = await Definition.query()
         .withCount('vote', (query) => {
           query.as('total_votes')
@@ -81,6 +82,12 @@ export default class DashboardUsersController {
       this.res.code = 500
       this.res.status = 'Error'
       this.res.message = 'Internal server error'
+
+      if (error.code === 'E_AUTHORIZATION_FAILURE') {
+        this.res.code = 403
+        this.res.status = 'Forbidden'
+        this.res.message = "You can't perform this action"
+      }
 
       return response.status(this.res.code).json(this.res)
     }
