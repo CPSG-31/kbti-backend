@@ -19,10 +19,11 @@ export default class AuthController {
         .where('email', email)
         .where('isActive', true)
         .firstOrFail()
+
       const apiToken: OpaqueTokenContract<User> = await auth.use('api').attempt(email, password, {
         expiresIn: '24hours',
       })
-      
+
       const { type, token, expiresAt } = apiToken
 
       this.res.data = {
@@ -49,7 +50,7 @@ export default class AuthController {
         this.res.message = error.message
       }
 
-      if (error.code === 'E_ROW_NOT_FOUND') {
+      if (error.code === 'E_ROW_NOT_FOUND' || error.code === 'E_INVALID_AUTH_PASSWORD') {
         this.res.code = 404
         this.res.status = 'Not Found'
         this.res.message = 'Email or password is incorrect'
