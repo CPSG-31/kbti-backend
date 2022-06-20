@@ -28,6 +28,7 @@ Route.group(() => {
   Route.post('register', 'AuthController.register')
   Route.post('login', 'AuthController.login')
   Route.get('logout', 'AuthController.logout').middleware('auth')
+  Route.get('/auth/token', 'AuthController.getTokenInfo').middleware('auth')
 })
 
 Route.get('/terms/new', 'TermsController.getNewlyAddedTerms')
@@ -51,6 +52,7 @@ Route.group(() => {
   Route.put('/definitions/:id/review', 'ManageDefinitionsController.reviewDefinitions')
   Route.get('/definitions/deleted', 'ManageDefinitionsController.getDeletedDefinitions')
   Route.delete('/definitions/:id/delete', 'ManageDefinitionsController.destroy')
+  Route.get('/statistics', 'ManageDefinitionsController.statistics')
 })
   .middleware('auth')
   .prefix('/admin')
