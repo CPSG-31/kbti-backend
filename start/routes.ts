@@ -28,6 +28,7 @@ Route.group(() => {
   Route.post('register', 'AuthController.register')
   Route.post('login', 'AuthController.login')
   Route.get('logout', 'AuthController.logout').middleware('auth')
+  Route.get('/auth/token', 'AuthController.getTokenInfo').middleware('auth')
 })
 
 Route.get('/terms/new', 'TermsController.getNewlyAddedTerms')
