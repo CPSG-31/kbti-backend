@@ -11,10 +11,12 @@ export default class ManageDefinitionsController {
   protected res: ResponseInterface = createResponse({ code: 200, status: 'Success' })
   protected LIMIT_PAGINATION = 10
 
-  public async index({ request, response }: HttpContextContract): Promise<void> {
+  public async index({ request, response, bouncer }: HttpContextContract): Promise<void> {
     const page = request.input('page', 1)
 
     try {
+      await bouncer.with('ManageDefinitionPolicy').authorize('getDefinitions')
+
       const definitionsPaginator: ModelPaginatorContract<Definition> = await Definition.query()
         .preload('statusDefinition')
         .where('status_definition_id', StatusDefinitions.APPROVED)
@@ -52,13 +54,25 @@ export default class ManageDefinitionsController {
         this.res.message = error.message
       }
 
+      if (error.code === 'E_AUTHORIZATION_FAILURE') {
+        this.res.code = 403
+        this.res.status = 'Forbidden'
+        this.res.message = "You can't perform this action"
+      }
+
       return response.status(this.res.code).json(this.res)
     }
   }
 
-  public async getReviewedDefinitions({ request, response }: HttpContextContract): Promise<void> {
+  public async getReviewedDefinitions({
+    request,
+    response,
+    bouncer,
+  }: HttpContextContract): Promise<void> {
     const page = request.input('page', 1)
     try {
+      await bouncer.with('ManageDefinitionPolicy').authorize('getReviewedDefinitions')
+
       const definitionsPaginator: ModelPaginatorContract<Definition> = await Definition.query()
         .preload('user')
         .preload('statusDefinition')
@@ -96,6 +110,12 @@ export default class ManageDefinitionsController {
         this.res.message = error.message
       }
 
+      if (error.code === 'E_AUTHORIZATION_FAILURE') {
+        this.res.code = 403
+        this.res.status = 'Forbidden'
+        this.res.message = "You can't perform this action"
+      }
+
       return response.status(this.res.code).json(this.res)
     }
   }
@@ -104,18 +124,22 @@ export default class ManageDefinitionsController {
     params,
     request,
     response,
+    bouncer,
   }: HttpContextContract): Promise<void> {
     const { id: definitionId }: Record<string, number> = params
     const { status_definition_id: statusDefinitionId }: { status_definition_id: number } =
       await request.validate(ReviewDefinitionValidator)
 
     try {
+      await bouncer.with('ManageDefinitionPolicy').authorize('reviewDefinition')
+
       const definition: Definition = await Definition.query()
         .where('id', definitionId)
         .where('status_definition_id', StatusDefinitions.REVIEW)
         .firstOrFail()
 
       definition.statusDefinitionId = statusDefinitionId
+
       await definition.save()
 
       this.res.message = 'Definition reviewed'
@@ -125,21 +149,33 @@ export default class ManageDefinitionsController {
       this.res.code = 500
       this.res.status = 'Error'
       this.res.message = error.message
-
+      console.log(error.message)
       if (error.code === 'E_ROW_NOT_FOUND') {
         this.res.code = 404
         this.res.status = 'Not Found'
         this.res.message = 'Definitions not found'
       }
 
+      if (error.code === 'E_AUTHORIZATION_FAILURE') {
+        this.res.code = 403
+        this.res.status = 'Forbidden'
+        this.res.message = "You can't perform this action"
+      }
+
       return response.status(this.res.code).json(this.res)
     }
   }
 
-  public async getDeletedDefinitions({ request, response }: HttpContextContract): Promise<void> {
+  public async getDeletedDefinitions({
+    request,
+    response,
+    bouncer,
+  }: HttpContextContract): Promise<void> {
     const page = request.input('page', 1)
 
     try {
+      await bouncer.with('ManageDefinitionPolicy').authorize('getDeletedDefinitions')
+
       const definitionsPaginator: ModelPaginatorContract<Definition> = await Definition.query()
         .preload('user')
         .preload('category')
@@ -179,14 +215,22 @@ export default class ManageDefinitionsController {
         this.res.message = error.message
       }
 
+      if (error.code === 'E_AUTHORIZATION_FAILURE') {
+        this.res.code = 403
+        this.res.status = 'Forbidden'
+        this.res.message = "You can't perform this action"
+      }
+
       return response.status(this.res.code).json(this.res)
     }
   }
 
-  public async destroy({ params, response }: HttpContextContract): Promise<void> {
+  public async destroy({ params, response, bouncer }: HttpContextContract): Promise<void> {
     const { id: definitionId }: Record<string, number> = params
 
     try {
+      await bouncer.with('ManageDefinitionPolicy').authorize('deleteDefinition')
+
       const definition: Definition = await Definition.query()
         .where('id', definitionId)
         .where('status_definition_id', StatusDefinitions.DELETED)
@@ -204,6 +248,12 @@ export default class ManageDefinitionsController {
         this.res.code = 404
         this.res.status = 'Not Found'
         this.res.message = 'Definitions not found'
+      }
+
+      if (error.code === 'E_AUTHORIZATION_FAILURE') {
+        this.res.code = 403
+        this.res.status = 'Forbidden'
+        this.res.message = "You can't perform this action"
       }
 
       return response.status(this.res.code).json(this.res)

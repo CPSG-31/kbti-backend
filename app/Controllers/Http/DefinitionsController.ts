@@ -152,13 +152,21 @@ export default class DefinitionsController {
     }
   }
 
-  public async update({ params, request, response, auth }: HttpContextContract): Promise<void> {
+  public async update({
+    params,
+    request,
+    response,
+    auth,
+    bouncer,
+  }: HttpContextContract): Promise<void> {
     const { id: userId }: User = auth.user!
     const { id }: Record<string, number> = params
     try {
-      const payload: Object = await request.validate(CreateDefinitionValidator)
+      const definition = await Definition.findOrFail(id)
 
-      await Definition.findOrFail(id)
+      await bouncer.with('DefinitionPolicy').authorize('updateDefinition', definition)
+
+      const payload: Object = await request.validate(CreateDefinitionValidator)
 
       await Definition.updateOrCreate(
         { id },
@@ -188,11 +196,17 @@ export default class DefinitionsController {
         this.res.message = 'Definition not found'
       }
 
+      if (error.code === 'E_AUTHORIZATION_FAILURE') {
+        this.res.code = 403
+        this.res.status = 'Forbidden'
+        this.res.message = "You can't perform this action"
+      }
+
       return response.status(this.res.code).json(this.res)
     }
   }
 
-  public async destroy({ params, response }: HttpContextContract): Promise<void> {
+  public async destroy({ params, response, bouncer }: HttpContextContract): Promise<void> {
     const { id }: Record<string, number> = params
 
     try {
@@ -200,6 +214,8 @@ export default class DefinitionsController {
         .where('id', id)
         .whereNot('status_definition_id', StatusDefinitions.DELETED)
         .firstOrFail()
+
+      await bouncer.with('DefinitionPolicy').authorize('deleteDefinition', definition)
 
       definition.statusDefinitionId = StatusDefinitions.DELETED
       definition.deletedAt = DateTime.local()
@@ -217,6 +233,12 @@ export default class DefinitionsController {
         this.res.code = 404
         this.res.status = 'Not Found'
         this.res.message = 'Definition not found'
+      }
+
+      if (error.code === 'E_AUTHORIZATION_FAILURE') {
+        this.res.code = 403
+        this.res.status = 'Forbidden'
+        this.res.message = "You can't perform this action"
       }
 
       return response.status(this.res.code).json(this.res)
