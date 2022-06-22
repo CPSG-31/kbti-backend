@@ -53,7 +53,7 @@ export default class VotesController {
 
       const { id, totalVotes, totalUpVotes }: Definition = definition
       const vote = {
-        vote_id: id,
+        definition_id: id,
         is_voted: isVoted,
         up_votes: totalUpVotes || 0,
         down_votes: getTotalDownVotes(totalVotes, totalUpVotes),
