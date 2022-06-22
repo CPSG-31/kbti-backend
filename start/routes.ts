@@ -43,7 +43,7 @@ Route.group(() => {
   Route.post('/definitions', 'DefinitionsController.store')
   Route.put('/definitions/:id', 'DefinitionsController.update')
   Route.delete('/definitions/:id', 'DefinitionsController.destroy')
-  Route.post('/definitions/:id/vote', 'DefinitionsController.storeVote')
+  Route.post('/definitions/:id/vote', 'VotesController.store')
 }).middleware('auth')
 
 Route.group(() => {
