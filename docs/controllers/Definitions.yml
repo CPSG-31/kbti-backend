@@ -60,8 +60,6 @@
     tags:
       - Definitions
     summary: Get Definition By Id
-    security:
-      - bearerAuth: []
     parameters:
       - in: path
         name: id
