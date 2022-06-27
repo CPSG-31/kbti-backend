@@ -39,12 +39,13 @@ Route.get('/definitions', 'DefinitionsController.index')
 
 Route.group(() => {
   Route.get('/dashboard', 'DashboardUsersController.index')
-  Route.get('/definitions/:id', 'DefinitionsController.show')
   Route.post('/definitions', 'DefinitionsController.store')
   Route.put('/definitions/:id', 'DefinitionsController.update')
   Route.delete('/definitions/:id', 'DefinitionsController.destroy')
   Route.post('/definitions/:id/vote', 'VotesController.store')
 }).middleware('auth')
+
+Route.get('/definitions/:id', 'DefinitionsController.show')
 
 Route.group(() => {
   Route.get('/definitions', 'ManageDefinitionsController.index')
