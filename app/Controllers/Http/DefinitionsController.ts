@@ -71,9 +71,8 @@ export default class DefinitionsController {
     }
   }
 
-  public async show({ params, response, auth }: HttpContextContract): Promise<void> {
+  public async show({ params, response }: HttpContextContract): Promise<void> {
     const { id: definitionId }: Record<string, number> = params
-    const { username }: User = auth.user!
 
     try {
       const data: Definition = await this.getDefinitionById(definitionId)
@@ -83,6 +82,7 @@ export default class DefinitionsController {
         categoryId,
         term,
         definition,
+        user,
         category,
         totalVotes,
         totalUpVotes,
@@ -96,7 +96,7 @@ export default class DefinitionsController {
         definition,
         category_id: categoryId,
         category: category.category,
-        username: username,
+        username: user.username,
         up_votes: totalUpVotes || 0,
         down_votes: getTotalDownVotes(totalVotes, totalUpVotes),
         created_at: getUnixTimestamp(createdAt),
@@ -274,7 +274,7 @@ export default class DefinitionsController {
       .preload('category')
       .where('status_definition_id', StatusDefinitions.APPROVED)
       .where('term', 'like', `%${term}%`)
-      .orderBy('term')
+      .orderBy('total_up_votes', 'desc')
   }
 
   private getDefinitionById(id: number): Promise<Definition> {
@@ -284,6 +284,9 @@ export default class DefinitionsController {
       })
       .withAggregate('vote', (query) => {
         query.sum('is_upvote').as('total_up_votes')
+      })
+      .preload('user', (userQuery) => {
+        userQuery.select('username')
       })
       .preload('category')
       .where('id', id)
