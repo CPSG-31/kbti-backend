@@ -257,7 +257,7 @@ export default class DefinitionsController {
       .preload('category')
       .where('status_definition_id', StatusDefinitions.APPROVED)
       .where('categoryId', categoryId)
-      .orderBy('updated_at', 'desc')
+      .orderBy('total_up_votes', 'desc')
   }
 
   private getDefinitionsByTerm(term: string): Promise<Definition[]> {
@@ -274,7 +274,7 @@ export default class DefinitionsController {
       .preload('category')
       .where('status_definition_id', StatusDefinitions.APPROVED)
       .where('term', 'like', `%${term}%`)
-      .orderBy('term')
+      .orderBy('total_up_votes', 'desc')
   }
 
   private getDefinitionById(id: number): Promise<Definition> {
