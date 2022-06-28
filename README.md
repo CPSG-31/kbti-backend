@@ -6,12 +6,12 @@ REST API for <a href="https://github.com/CPSG-31/kbti-frontend">KBTI  (Kamus Bes
 
 1. Clone the project
     ```bash
-      git clone https://link-to-project
+      git clone https://github.com/CPSG-31/kbti-backend.git
     ```
 
 2. Go to the project directory
     ```bash
-      cd my-project
+      cd kbti-backend
     ```
 
 3. Install dependencies
